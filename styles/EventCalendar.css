@@ -1,0 +1,276 @@
+/* Global event style */
+.fc-event {
+  border-radius: 0px;
+  font-weight: bold;
+  font-size: 14px;
+  color: #333;
+  border: none;
+  cursor: pointer;
+}
+
+/* Time grid slot labels (hour labels) */
+.fc .fc-timegrid-slot-label {
+  font-size: 12px;
+  color: #555;
+  
+}
+
+/* Day headers */
+.fc .fc-col-header-cell-cushion {
+  color: #333;
+  font-weight: 600;
+}
+
+/* Today highlight */
+.fc-day-today {
+    background-color: var(--color-light) !important;
+}
+
+.fc .fc-toolbar-title {
+   color: var(--color-primary) !important;
+   text-align: center;
+}
+
+/* Add this to your global CSS file */
+.fc .fc-toolbar {
+  background-color:  var(--color-light) ; /* Your desired color */
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.fc .fc-toolbar.fc-header-toolbar {
+     margin-bottom: 0em; 
+}
+
+/* TrainingCalendar.css */
+.TrainingContainer {
+  width: 90%;
+  height: 1570px;
+  margin: 50px auto;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 10px 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  background-color: #fff;
+}
+
+.TrainingContainerAdmin {
+  height: 1570px;
+  margin: 50px auto;
+  border-radius: 10px;
+  padding: 10px 20px;
+  background-color: #fff;
+}
+
+.fc .fc-button-primary {
+    background-color: var(--color-secondary);
+    border-color: var(--color-primary);
+    color: var(--fc-button-text-color);
+}
+.fc .fc-button-primary:hover {
+  background-color: var(--color-primary);
+}
+.fc .fc-button-primary:disabled {
+    background-color: var(--color-light);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    opacity: 1;
+    font-weight: 600;
+}
+
+.fc-event:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* shadow */
+  border: 2px solid #333;        /* border on hover */
+}
+
+.fc .fc-timegrid-slot {
+  height: 40px; /* default is ~30px, increase for bigger rows */
+}
+
+.fc-v-event .fc-event-title {
+    font-size: 18px;
+    word-break: break-word;
+}
+
+.fc-v-event .fc-event-time {
+  font-size: 18px;
+  white-space: normal !important;  /* allow wrapping */
+  overflow: visible !important;    /* ensure text isn't clipped */
+  text-overflow: unset !important;
+  line-height: 1.2em;              /* optional: better spacing */
+  word-break: break-word;  /* break long words */
+}
+
+
+/* Default row height for large screens */
+.fc .fc-timegrid-slot {
+  height: 60px; /* large screens */
+}
+
+/* Optional: adjust all-day slots if used */
+.fc .fc-daygrid-day {
+  min-height: 60px;
+}
+
+.modal-overlay {
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background: rgba(0, 0, 0, 0.6);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              z-index: 1000;
+            }
+            .modal {
+              background: white;
+              padding: 1.5rem;
+              border-radius: 8px;
+              width: 700px;
+
+            }
+           
+            .modal-form label {
+              display: flex;
+              flex-direction: column;
+              margin-bottom: 1rem;
+            }
+            .input-field {
+              border: 1px solid #ccc;
+              border-radius: 4px;
+              padding: 0.5rem;
+              margin-top: 0.25rem;
+              font-size: 1rem;
+            }
+            .weekdays {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 0.5rem;
+              margin-bottom: 1rem;
+            }
+            .weekdays label {
+              display: flex;
+              align-items: center;
+              font-size: 0.9rem;
+            }
+            .modal-buttons {
+              display: flex;
+              justify-content: space-between;
+            }
+            .btn-save {
+              background-color: #4caf50;
+              color: white;
+              border: none;
+              padding: 0.5rem 1rem;
+              border-radius: 4px;
+              cursor: pointer;
+            }
+            .btn-delete {
+              background-color: #f44336;
+              color: white;
+              border: none;
+              padding: 0.5rem 1rem;
+              border-radius: 4px;
+              cursor: pointer;
+            }
+            .btn-cancel {
+              background-color: #888;
+              color: white;
+              border: none;
+              padding: 0.5rem 1rem;
+              border-radius: 4px;
+              cursor: pointer;
+            }
+
+.rdp-selected .rdp-day_button {
+    border: none !important;
+}
+
+.rdp-chevron {
+    fill:   var(--color-tertiary) !important; /* green */
+    display: inline-block;
+}
+
+.rdp-range_start .rdp-day_button,.rdp-range_end .rdp-day_button {
+    background-color: var(--color-tertiary);
+    color: var(--rdp-range_start-color);
+}
+
+.rdp-root {
+    --rdp-accent-color: var(--color-tertiary);
+    --rdp-accent-background-color: #f0f0ff;
+    --rdp-day-height: 44px;
+    --rdp-day-width: 44px;
+    --rdp-day_button-border-radius: 100%;
+    --rdp-day_button-border: 2px solid transparent;
+    --rdp-day_button-height: 42px;
+    --rdp-day_button-width: 42px;
+    /* --rdp-selected-border: 2px solid var(--rdp-accent-color); */
+    --rdp-disabled-opacity: .5;
+    --rdp-outside-opacity: .75;
+    /* --rdp-today-color: var(--rdp-accent-color); */
+    --rdp-dropdown-gap: .5rem;
+    --rdp-months-gap: 2rem;
+    --rdp-nav_button-disabled-opacity: .5;
+    --rdp-nav_button-height: 2.25rem;
+    --rdp-nav_button-width: 2.25rem;
+    --rdp-nav-height: 2.75rem;
+    --rdp-range_middle-background-color: var(--rdp-accent-background-color);
+    --rdp-range_middle-color: inherit;
+    --rdp-range_start-color: white;
+    --rdp-range_start-background: linear-gradient(var(--rdp-gradient-direction), transparent 50%, var(--color-tertiary) 50%);
+    /* --rdp-range_start-date-background-color: var(--rdp-accent-color); */
+    --rdp-range_end-background: linear-gradient(var(--rdp-gradient-direction), var(--color-tertiary) 50%, transparent 50%);
+    --rdp-range_end-color: white;
+    --rdp-range_end-date-background-color: var(--color-tertiary);
+    --rdp-week_number-border-radius: 100%;
+    --rdp-week_number-border: 2px solid transparent;
+    --rdp-week_number-height: var(--rdp-day-height);
+    --rdp-week_number-opacity: .75;
+    --rdp-week_number-width: var(--rdp-day-width);
+    --rdp-weeknumber-text-align: center;
+    --rdp-weekday-opacity: .75;
+    --rdp-weekday-padding: .5rem 0rem;
+    --rdp-weekday-text-align: center;
+    --rdp-gradient-direction: 90deg;
+    --rdp-animation_duration: .3s;
+    --rdp-animation_timing: cubic-bezier(.4, 0, .2, 1);
+}
+
+.rdp-months {
+    gap: var(--rdp-months-gap);
+    flex-wrap: wrap;
+    max-width: fit-content;
+    display: flex;
+    position: relative;
+    justify-content: center;
+}
+/* Small screens: mobile/tablet */
+@media (max-width: 768px) {
+  .fc .fc-timegrid-slot {
+    height: 40px; /* smaller rows */
+  }
+
+  .fc .fc-daygrid-day {
+    min-height: 40px;
+  }
+
+  .TrainingContainer {
+    height: 1080px;
+  }
+
+  .fc-v-event .fc-event-time {
+  font-size: 18px;
+}
+.fc-v-event .fc-event-title {
+  font-size: 18px;
+}
+
+.fc .fc-toolbar-title {
+   color: var(--color-primary) !important;
+   text-align: center;
+   font-size: 20px;
+}
+}
