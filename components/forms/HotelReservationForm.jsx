@@ -1,7 +1,9 @@
+"use client";
 import React, { useState, useRef } from "react";
 import { ClientForm } from "./ClientForm";
 import { DogFormAllInfo } from "./DogFormAllInfo";
 import CustomDropdown from "../CustomDropdown";
+import PaymentForm from "./PaymentForm";
 
 function HotelReservationForm({
   pricePerDay,
@@ -298,8 +300,8 @@ function HotelReservationForm({
                 className="border border-[var(--color-tertiary)] p-2 rounded-xl bg-white w-full resize-none"
               />
             </div>
-
-            <div className="flex w-full gap-1 shadow-xl bg-white p-6 rounded-2xl font-bold text-lg">
+            <PaymentForm />
+            <div className="flex w-full gap-1 shadow-xl bg-white p-6 rounded-2xl font-bold text-md">
               <div className="text-xl">Cena:</div>
 
               <div className="text-right flex flex-col flex-1">

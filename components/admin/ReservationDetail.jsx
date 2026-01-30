@@ -1,10 +1,13 @@
 "use client";
-import React, { useState } from "react";
 
+import React, { useState } from "react";
+import { toast } from "react-hot-toast";
+import "../../styles/EventCalendar.css";
+import Loading from "../Loading";
 function ReservationDetail({ reservationProps, onPaymentChange }) {
   const [reservation, setReservation] = useState(reservationProps);
   const [loading, setLoading] = useState(false);
-  console.log(reservationProps);
+
   const formatDateSK = (date) => {
     if (!date) return "";
 
@@ -14,6 +17,9 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
       year: "numeric",
     }).format(new Date(date));
   };
+
+  const [isSaving, setIsSaving] = useState(false);
+
   const handlePaymentChange = async (attr, value) => {
     setReservation((prev) => ({ ...prev, [attr]: value }));
     setLoading(true);
@@ -21,7 +27,7 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
     try {
       const reservation_id =
         reservation.reservation_type === "long_term"
-          ? reservation.long_term_reservation_id ?? reservation.reservation_id
+          ? (reservation.long_term_reservation_id ?? reservation.reservation_id)
           : reservation.event_reservation_id;
       const response = await fetch(
         "https://www.psiaskola.sk/wp-json/events/v1/update-payment",
@@ -34,7 +40,7 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
             field: attr, // "is_paid" or "is_deposit_paid"
             value: value,
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -78,7 +84,7 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
           <div className="text-center font-bold text-md">
             {reservation.end_date
               ? `${formatDateSK(reservation.start_date)} - ${formatDateSK(
-                  reservation.end_date
+                  reservation.end_date,
                 )}`
               : formatDateSK(reservation.start_date)}
           </div>
@@ -108,10 +114,10 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
               try {
                 const reservation_id =
                   reservation.reservation_type === "long_term"
-                    ? reservation.long_term_reservation_id ??
-                      reservation.reservation_id
-                    : reservation.event_reservation_id ??
-                      reservation.reservation_id;
+                    ? (reservation.long_term_reservation_id ??
+                      reservation.reservation_id)
+                    : (reservation.event_reservation_id ??
+                      reservation.reservation_id);
                 const response = await fetch(
                   "https://www.psiaskola.sk/wp-json/events/v1/delete-reservation",
                   {
@@ -121,7 +127,7 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
                       reservation_id: reservation_id,
                       reservation_type: reservation.reservation_type,
                     }),
-                  }
+                  },
                 );
 
                 const data = await response.json();

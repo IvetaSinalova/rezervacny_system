@@ -33,6 +33,7 @@ export default function EventCalendar({
     repeatCount: 1, // for daily
     repeatWeeks: 1,
     note: null,
+    admin_note: null,
   });
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [confirmMsg, setConfirmMsg] = useState("");
@@ -97,6 +98,7 @@ export default function EventCalendar({
         end: formatDateForInput(event.end),
         note: event.extendedProps.note || null,
         maxCapacity: event.extendedProps.maxCapacity || 10,
+        admin_note: event.extendedProps.admin_note,
       });
     } else if (selection) {
       setSelectedEvent(null);
@@ -124,7 +126,7 @@ export default function EventCalendar({
     e.preventDefault();
     setReservationToDelete(reservation);
     setConfirmMsg(
-      `Naozaj chcete zmazať užívateľa ${reservation.first_name} ${reservation.last_name} zo zvoleného kurzu?`
+      `Naozaj chcete zmazať užívateľa ${reservation.first_name} ${reservation.last_name} zo zvoleného kurzu?`,
     );
     setConfirmVisible(true);
   };
@@ -136,8 +138,8 @@ export default function EventCalendar({
     try {
       const reservation_id =
         reservationToDelete.reservation_type === "long_term"
-          ? reservationToDelete.long_term_reservation_id ??
-            reservationToDelete.reservation_id
+          ? (reservationToDelete.long_term_reservation_id ??
+            reservationToDelete.reservation_id)
           : reservationToDelete.event_reservation_id;
       const response = await fetch(
         "https://www.psiaskola.sk/wp-json/events/v1/delete-user-from-event",
@@ -149,7 +151,7 @@ export default function EventCalendar({
           body: JSON.stringify({
             id: reservation_id,
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -161,7 +163,7 @@ export default function EventCalendar({
       }
 
       alert(
-        `${reservationToDelete.first_name} ${reservationToDelete.last_name} bol úspešne odstránený z kurzu.`
+        `${reservationToDelete.first_name} ${reservationToDelete.last_name} bol úspešne odstránený z kurzu.`,
       );
       window.location.reload();
       setModalVisible(false);
@@ -247,7 +249,7 @@ export default function EventCalendar({
           end_date: formData.end,
           note: formData.note,
         }),
-      }
+      },
     );
 
     const result = await response.json();
@@ -300,10 +302,11 @@ export default function EventCalendar({
                     extendedProps: {
                       eventTypeId: formData.eventTypeId,
                       maxCapacity: formData.maxCapacity,
+                      admin_note: formData.admin_note,
                     },
                   }
-                : ev
-            )
+                : ev,
+            ),
           );
         } else {
           // Add new
@@ -342,7 +345,7 @@ export default function EventCalendar({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ id: selectedEvent.id }), // <-- must be correct
-        }
+        },
       );
       const data = await res.json();
       if (data.success) {
@@ -355,7 +358,7 @@ export default function EventCalendar({
   };
 
   const selectedType = eventTypes.find(
-    (type) => type.id == formData.eventTypeId
+    (type) => type.id == formData.eventTypeId,
   );
 
   return (
@@ -598,10 +601,10 @@ export default function EventCalendar({
                                       return isTarget
                                         ? { ...res, [attr]: value }
                                         : res;
-                                    }
+                                    },
                                   ),
                                 };
-                              })
+                              }),
                             );
                           }}
                           reservationProps={
@@ -705,7 +708,7 @@ export default function EventCalendar({
                                     type="checkbox"
                                     value={day}
                                     checked={formData.recurringDays.includes(
-                                      day
+                                      day,
                                     )}
                                     onChange={handleWeekdayChange}
                                   />
@@ -749,30 +752,35 @@ export default function EventCalendar({
                       }
                     />
                   </div>
-
-                  {selectedType &&
-                    ((selectedType.admin === 1 && existsReturnDog) ||
-                      selectedType.admin === 0 ||
-                      !selectedType) && (
-                      <div>
-                        <label className="font-semibold text-md">
-                          Poznámka:
-                          <textarea
-                            value={formData.note || ""}
-                            onChange={(e) =>
-                              handleChange("note", e.target.value)
-                            }
-                            className="input-field min-h-[100px]" // adjust 100px as needed
-                          />
-                        </label>
-                      </div>
-                    )}
                 </div>
               )}
 
+              {!selectedEvent ||
+                (selectedEvent && editType === "event" && (
+                  <div className="bg-gray-50 p-4 rounded-xl shadow-inner space-y-2 mt-6">
+                    <label className="font-semibold text-md ">
+                      Poznámka pre admina:
+                      <textarea
+                        value={formData.admin_note || ""}
+                        onChange={(e) =>
+                          handleChange("admin_note", e.target.value)
+                        }
+                        className="input-field min-h-[100px] font-normal" // adjust 100px as needed
+                      />
+                    </label>
+                  </div>
+                ))}
+
               <div className="modal-buttons mt-6">
-                <button type="submit" className="btn-save">
-                  Uložiť
+                <button
+                  type="button"
+                  onClick={() => {
+                    setModalVisible(false);
+                    setEditType("event");
+                  }}
+                  className="btn-cancel"
+                >
+                  Zrušiť
                 </button>
 
                 {selectedEvent &&
@@ -787,15 +795,8 @@ export default function EventCalendar({
                     </button>
                   )}
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setModalVisible(false);
-                    setEditType("event");
-                  }}
-                  className="btn-cancel"
-                >
-                  Zrušiť
+                <button type="submit" className="btn-save">
+                  Uložiť
                 </button>
               </div>
             </form>

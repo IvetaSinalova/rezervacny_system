@@ -32,11 +32,10 @@ export const AvailableDaysProvider = ({ children }) => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ from, to, event_name: serviceName }),
-        }
+        },
       );
 
       const data = await response.json();
-      console.log(data);
 
       // Normalize dates
       const normalizedDays = data.availableDays.map((d) => ({
@@ -77,7 +76,7 @@ export const AvailableDaysProvider = ({ children }) => {
       const format = (date) =>
         `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
           2,
-          "0"
+          "0",
         )}-${String(date.getDate()).padStart(2, "0")}`;
 
       await fetchAvailableDays({
@@ -88,7 +87,7 @@ export const AvailableDaysProvider = ({ children }) => {
 
       setLoadedMonths((prev) => [...prev, monthKey]);
     },
-    [loadedMonths, fetchAvailableDays]
+    [loadedMonths, fetchAvailableDays],
   );
 
   return (

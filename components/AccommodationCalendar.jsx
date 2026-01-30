@@ -41,13 +41,13 @@ export default function AccommodationCalendar({ serviceName }) {
     }
 
     const disabled = allDays.filter(
-      (d) => !dates.some((x) => x.toDateString() === d.toDateString())
+      (d) => !dates.some((x) => x.toDateString() === d.toDateString()),
     );
 
     setDisabledDays((prev) => [
       ...prev,
       ...disabled.filter(
-        (d) => !prev.some((pd) => pd.toDateString() === d.toDateString())
+        (d) => !prev.some((pd) => pd.toDateString() === d.toDateString()),
       ),
     ]);
 
@@ -68,12 +68,12 @@ export default function AccommodationCalendar({ serviceName }) {
       const fromDate = new Date(
         baseMonth.getFullYear(),
         baseMonth.getMonth(),
-        1
+        1,
       );
       const toDate = new Date(
         baseMonth.getFullYear(),
         baseMonth.getMonth() + 2,
-        0
+        0,
       );
 
       const format = (date) =>
@@ -89,7 +89,7 @@ export default function AccommodationCalendar({ serviceName }) {
               to: format(toDate),
               event_name: serviceName,
             }),
-          }
+          },
         );
 
         const data = await response.json();
@@ -105,7 +105,7 @@ export default function AccommodationCalendar({ serviceName }) {
         console.error("Failed to fetch available days:", err);
       }
     },
-    [buildDaySets, loadedMonths]
+    [buildDaySets, loadedMonths],
   );
 
   const prefetchYear = useCallback(
@@ -124,7 +124,7 @@ export default function AccommodationCalendar({ serviceName }) {
       await Promise.all(promises);
       setPrefetchingYear(false);
     },
-    [loadedMonths, loadMonth, prefetchingYear]
+    [loadedMonths, loadMonth, prefetchingYear],
   );
 
   useEffect(() => {
@@ -137,7 +137,7 @@ export default function AccommodationCalendar({ serviceName }) {
     const lastVisibleMonth = new Date(
       newMonth.getFullYear(),
       newMonth.getMonth() + 1,
-      1
+      1,
     );
     const lastMonthKey = `${lastVisibleMonth.getFullYear()}-${lastVisibleMonth.getMonth()}`;
     if (!loadedMonths.includes(lastMonthKey))
@@ -272,7 +272,7 @@ export default function AccommodationCalendar({ serviceName }) {
                 accommodations={selectedDayData.accommodations}
                 startDate={selectedDay.toLocaleDateString("sk-SK")}
                 endDate={new Date(
-                  selectedDay.getTime() + fixedDays * 24 * 60 * 60 * 1000
+                  selectedDay.getTime() + fixedDays * 24 * 60 * 60 * 1000,
                 ).toLocaleDateString("sk-SK")}
               />
             </div>

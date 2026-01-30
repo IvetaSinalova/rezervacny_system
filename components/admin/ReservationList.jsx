@@ -26,7 +26,7 @@ export default function ReservationList({
       <ul className="divide-y">
         {reservations.map((r) => (
           <li
-            key={`${r.reservation_id}-${r.calendar_event_id}`}
+            key={`${r.reservation_id}-${r.event_calendar_id}`}
             onClick={() => onClick(r)}
             className="py-4 cursor-pointer hover:bg-gray-50 px-2 transition"
           >
@@ -49,7 +49,7 @@ export default function ReservationList({
                   <b>{dateLabel}:</b>{" "}
                   {range
                     ? `${formatDateSK(r.start_date)} – ${formatDateSK(
-                        r.end_date
+                        r.end_date,
                       )}`
                     : formatDateSK(r.start_date)}
                 </div>

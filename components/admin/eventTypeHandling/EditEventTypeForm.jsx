@@ -25,13 +25,14 @@ export default function EditEventTypeForm({
   const handleChange = (id, field, value) => {
     setEvents((prev) =>
       prev.map((event) =>
-        event.id === id ? { ...event, [field]: value } : event
-      )
+        event.id === id ? { ...event, [field]: value } : event,
+      ),
     );
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     updateLoading(true);
     try {
       const res = await fetch(
@@ -40,7 +41,7 @@ export default function EditEventTypeForm({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ events }),
-        }
+        },
       );
 
       const data = await res.json();
@@ -79,6 +80,9 @@ export default function EditEventTypeForm({
                 </th>
                 <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
                   Max počet lekcií
+                </th>
+                <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                  Priorita
                 </th>
                 <th
                   style={{ border: "1px solid #ccc", padding: "0.5rem" }}
@@ -128,6 +132,67 @@ export default function EditEventTypeForm({
                       style={{ width: "100%" }}
                     />
                   </td>
+
+                  <td
+                    style={{
+                      border: "1px solid #ccc",
+                      padding: "0.5rem",
+                      textAlign: "center",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      // Checks if priority is 1
+                      checked={event.priority === 1}
+                      // Toggles between 1 and 0
+                      onChange={(e) =>
+                        handleChange(
+                          event.id,
+                          "priority",
+                          e.target.checked ? 1 : 0,
+                        )
+                      }
+                      style={{
+                        appearance: "none",
+                        WebkitAppearance: "none", // For Safari support
+                        width: "20px",
+                        height: "20px",
+                        borderRadius: "50%",
+                        border: "2px solid #ccc",
+                        backgroundColor: "transparent",
+                        cursor: "pointer",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        transition: "all 0.2s ease",
+                        outline: "none",
+                        // When checked, apply the primary color and change border
+                        background:
+                          event.priority === 1
+                            ? "var(--color-primary)"
+                            : "transparent",
+                        borderColor:
+                          event.priority === 1
+                            ? "var(--color-primary)"
+                            : "#ccc",
+                      }}
+                      // Adding an inner dot via a radial gradient when checked
+                      className="priority-checkbox"
+                    />
+                    <style jsx>{`
+                      input[type="checkbox"]:checked {
+                        background-image: radial-gradient(
+                          circle,
+                          white 35%,
+                          transparent 40%
+                        );
+                      }
+                      input[type="checkbox"]:hover {
+                        border-color: var(--color-primary);
+                        opacity: 0.8;
+                      }
+                    `}</style>
+                  </td>
                   <td
                     style={{
                       border: "1px solid #ccc",
@@ -147,7 +212,7 @@ export default function EditEventTypeForm({
                         updateLoading(true);
                         if (
                           !confirm(
-                            "Naozaj chcete odstrániť túto udalosť? Odstránite tým aj všetky výskyty udalosti v kalendári."
+                            "Naozaj chcete odstrániť túto udalosť? Odstránite tým aj všetky výskyty udalosti v kalendári.",
                           )
                         )
                           return;
@@ -159,18 +224,18 @@ export default function EditEventTypeForm({
                               method: "POST",
                               headers: { "Content-Type": "application/json" },
                               body: JSON.stringify({ id: event.id }),
-                            }
+                            },
                           );
                           const data = await res.json();
                           if (data.success) {
                             setEvents((prev) =>
-                              prev.filter((e) => e.id !== event.id)
+                              prev.filter((e) => e.id !== event.id),
                             );
                             setStatus("Udalosť bola úspešne odstránená");
                             updateLoading(false);
                           } else {
                             setStatus(
-                              "Chyba: " + (data.message || "Neznáma chyba")
+                              "Chyba: " + (data.message || "Neznáma chyba"),
                             );
                             updateLoading(false);
                           }

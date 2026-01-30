@@ -19,17 +19,16 @@ export function AdminDataProvider({ children }) {
     setLoading(true);
     Promise.all([
       fetch(
-        "https://psiaskola.sk/wp-json/events/v1/all-types-events-admin"
+        "https://psiaskola.sk/wp-json/events/v1/all-types-events-admin",
       ).then((res) => res.json()),
       fetch(
-        "https://psiaskola.sk/wp-json/events/v1/all-calendar-events-with-clients"
+        "https://psiaskola.sk/wp-json/events/v1/all-calendar-events-with-clients",
       ).then((res) => res.json()),
       fetch("https://psiaskola.sk/wp-json/events/v1/all-accomodations").then(
-        (res) => res.json()
+        (res) => res.json(),
       ),
     ])
       .then(([types, eventsData, accomodations]) => {
-        console.log(eventsData);
         setEventTypes(types);
         setEvents(eventsData);
         setAccomodations(accomodations);

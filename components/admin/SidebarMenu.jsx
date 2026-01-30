@@ -34,6 +34,22 @@ export default function SidebarMenu() {
         },
       ],
     },
+    {
+      label: "Vytvoriť rezerváciu",
+      submenu: [
+        { label: "Kurz", href: "/admin/create-event-reservation" },
+        {
+          label: "Prevýchova",
+          href: "/admin/create-rehabilitation-reservation",
+        },
+        { label: "Výcvik", href: "/admin/create-training-reservation" },
+        { label: "Hotel", href: "/admin/create-hotel-reservation" },
+        {
+          label: "Hotel s dlhodobým ubytovaním",
+          href: "/admin/create-long-term-hotel-reservation",
+        },
+      ],
+    },
   ];
 
   return (

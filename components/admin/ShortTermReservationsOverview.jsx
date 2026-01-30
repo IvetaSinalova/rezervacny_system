@@ -8,7 +8,7 @@ const ShortTermReservationsOverview = () => {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     fetch(
-      "https://psiaskola.sk/wp-json/events/v1/short-term-reservations-overview"
+      "https://psiaskola.sk/wp-json/events/v1/short-term-reservations-overview",
     )
       .then((res) => res.json())
       .then((data) => {

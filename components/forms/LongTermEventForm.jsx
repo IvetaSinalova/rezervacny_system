@@ -1,7 +1,9 @@
+"use client";
 import React, { useState, useEffect, useRef } from "react";
 import { ClientForm } from "./ClientForm";
 import { DogFormAllInfo } from "./DogFormAllInfo";
 import CustomDropdown from "../CustomDropdown";
+import PaymentForm from "./PaymentForm";
 
 function LongTermEventForm({
   serviceName,
@@ -50,7 +52,7 @@ function LongTermEventForm({
 
   function getAccommodationPrice(name) {
     const accommodation = accommodationsPrice.find(
-      (item) => item.name === name
+      (item) => item.name === name,
     );
     if (!accommodation) return 0; // not found
     const price = parseFloat(accommodation.price);
@@ -138,7 +140,7 @@ function LongTermEventForm({
             "Content-Type": "application/json",
           },
           body: JSON.stringify(payload),
-        }
+        },
       );
 
       const result = await response.json();
@@ -216,7 +218,7 @@ function LongTermEventForm({
               label="Vyberte čas odovzdania psa"
               value={formData.selectedTime}
               options={availableTimes.flatMap((time) =>
-                generateTimeOptions(time.from, time.to)
+                generateTimeOptions(time.from, time.to),
               )}
               onSelect={(selected) =>
                 setFormData((prev) => ({ ...prev, selectedTime: selected }))
@@ -300,20 +302,27 @@ function LongTermEventForm({
                 className="border border-[var(--color-tertiary)] p-2 rounded-xl bg-white w-full resize-none"
               />
             </div>
+            <PaymentForm />
 
-            <div className="flex flex-col gap-1 shadow-xl bg-white p-6 rounded-2xl font-bold text-xl text-right">
+            <div className="flex flex-col gap-1 shadow-xl bg-white p-6 rounded-2xl font-bold">
               {accomodationPrice > 0 ? (
                 <div>
-                  <div className="font-normal">
-                    {formData.accommodation}: {accomodationPrice}€
+                  <div className="text-xl">Cena:</div>
+                  <div className="text-right flex flex-col flex-1">
+                    <div className="font-normal">
+                      {formData.accommodation}: {accomodationPrice.toFixed(2)}€
+                    </div>
+                    <div className="font-normal">
+                      {serviceName}: {parseFloat(price).toFixed(2)}€
+                    </div>
+                    Spolu: {(parseFloat(price) + accomodationPrice).toFixed(2)}€
                   </div>
-                  <div className="font-normal">
-                    {serviceName}: {price}€
-                  </div>
-                  Spolu: {parseFloat(price) + accomodationPrice}€
                 </div>
               ) : (
-                <div> Cena: {parseFloat(price) + accomodationPrice}€</div>
+                <div>
+                  {" "}
+                  Cena: {(parseFloat(price) + accomodationPrice).toFixed(2)}€
+                </div>
               )}
             </div>
             {message && !success && (

@@ -9,7 +9,7 @@ import "../styles/EventCalendar.css";
 import EventForm from "./forms/EventForm";
 import Loading from "./Loading";
 
-export default function EventCalendar() {
+export default function EventCalendar({ alwaysReservable = false }) {
   const calendarRef = useRef(null);
   const [currentView, setCurrentView] = useState("timeGridWeek");
   const [events, setEvents] = useState([]);
@@ -23,10 +23,10 @@ export default function EventCalendar() {
     setLoading(true);
     Promise.all([
       fetch("https://psiaskola.sk/wp-json/events/v1/all-types-events").then(
-        (res) => res.json()
+        (res) => res.json(),
       ),
       fetch("https://psiaskola.sk/wp-json/events/v1/all-calendar-events").then(
-        (res) => res.json()
+        (res) => res.json(),
       ),
     ])
       .then(([typesData, eventsData]) => {
@@ -41,7 +41,7 @@ export default function EventCalendar() {
             ...ev,
             extendedProps: {
               ...ev.extendedProps,
-              reservable: now <= cutoff,
+              reservable: now <= cutoff || alwaysReservable,
             },
           };
         });
@@ -65,7 +65,7 @@ export default function EventCalendar() {
     const type = eventTypes.find(
       (et) =>
         et.name === selectedEvent.extendedProps?.name ||
-        et.name === selectedEvent.name
+        et.name === selectedEvent.name,
     );
 
     setSelectedEventType(type || null);
@@ -204,7 +204,7 @@ export default function EventCalendar() {
               const messages = [];
               if (!reservable)
                 messages.push(
-                  "Rezervácie sú možné len minimálne 48 hodín pred začiatkom kurzu."
+                  "Rezervácie sú možné len minimálne 48 hodín pred začiatkom kurzu.",
                 );
               if (parseInt(currentCapacity) >= parseInt(maxCapacity))
                 messages.push("Kapacita kurzu je naplnená.");

@@ -42,13 +42,13 @@ export default function HotelReservation({ serviceName }) {
     }
 
     const disabled = allDays.filter(
-      (d) => !dates.some((x) => x.toDateString() === d.toDateString())
+      (d) => !dates.some((x) => x.toDateString() === d.toDateString()),
     );
 
     setDisabledDays((prev) => [
       ...prev,
       ...disabled.filter(
-        (d) => !prev.some((pd) => pd.toDateString() === d.toDateString())
+        (d) => !prev.some((pd) => pd.toDateString() === d.toDateString()),
       ),
     ]);
 
@@ -76,12 +76,12 @@ export default function HotelReservation({ serviceName }) {
       const fromDate = new Date(
         baseMonth.getFullYear(),
         baseMonth.getMonth(),
-        1
+        1,
       );
       const toDate = new Date(
         baseMonth.getFullYear(),
         baseMonth.getMonth() + 2,
-        0
+        0,
       );
 
       const format = (date) =>
@@ -98,7 +98,7 @@ export default function HotelReservation({ serviceName }) {
               to: format(toDate),
               event_name: serviceName,
             }),
-          }
+          },
         );
 
         const data = await response.json();
@@ -111,7 +111,7 @@ export default function HotelReservation({ serviceName }) {
         console.error("Failed to fetch available days:", err);
       }
     },
-    [buildDaySets, loadedMonths]
+    [buildDaySets, loadedMonths],
   );
 
   // Prefetch full year in background
@@ -132,7 +132,7 @@ export default function HotelReservation({ serviceName }) {
       await Promise.all(promises);
       setPrefetchingYear(false);
     },
-    [loadedMonths, loadMonth, prefetchingYear]
+    [loadedMonths, loadMonth, prefetchingYear],
   );
 
   // Initial load
@@ -199,7 +199,7 @@ export default function HotelReservation({ serviceName }) {
     selectSingleDayFromMany(value.from, value.to);
 
     const nights = Math.round(
-      (to.getTime() - from.getTime() + 1) / (1000 * 60 * 60 * 24)
+      (to.getTime() - from.getTime() + 1) / (1000 * 60 * 60 * 24),
     );
 
     setNumOfNights(nights);
@@ -224,7 +224,7 @@ export default function HotelReservation({ serviceName }) {
     const lastVisibleMonth = new Date(
       newMonth.getFullYear(),
       newMonth.getMonth() + 1,
-      1
+      1,
     );
     const lastMonthKey = `${lastVisibleMonth.getFullYear()}-${lastVisibleMonth.getMonth()}`;
     if (!loadedMonths.includes(lastMonthKey)) {
@@ -260,11 +260,11 @@ export default function HotelReservation({ serviceName }) {
 
     // 1. Setup the mutable UTC-normalized copy for iteration
     let currentDate = new Date(
-      Date.UTC(from.getFullYear(), from.getMonth(), from.getDate())
+      Date.UTC(from.getFullYear(), from.getMonth(), from.getDate()),
     );
 
     const loopEndDate = new Date(
-      Date.UTC(to.getFullYear(), to.getMonth(), to.getDate())
+      Date.UTC(to.getFullYear(), to.getMonth(), to.getDate()),
     );
 
     // 2. The Date Iteration Loop
@@ -274,7 +274,7 @@ export default function HotelReservation({ serviceName }) {
       const month = currentDate.getUTCMonth() + 1;
       const dayOfMonth = currentDate.getUTCDate();
       const dateKey = `${year}-${String(month).padStart(2, "0")}-${String(
-        dayOfMonth
+        dayOfMonth,
       ).padStart(2, "0")}`;
 
       const day = calendarData[dateKey];
@@ -310,7 +310,7 @@ export default function HotelReservation({ serviceName }) {
           free: data.free, // The value's 'free' property becomes the 'free' property
           // You could also include the 'date' if needed: date: data.date
         };
-      }
+      },
     );
     setSelectedDayData(finalAccommodationsArray);
 
@@ -371,6 +371,7 @@ export default function HotelReservation({ serviceName }) {
           hoverRange, // dynamic hover range
           today: new Date(),
         }}
+        locale={sk}
         modifiersStyles={{
           selected: {
             backgroundColor: "var(--color-tertiary)",

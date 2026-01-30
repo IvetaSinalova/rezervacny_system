@@ -2,6 +2,8 @@
 import { useRef, useState } from "react";
 import { ClientForm } from "./ClientForm";
 import { DogFormAllInfo } from "./DogFormAllInfo";
+import PaymentForm from "./PaymentForm";
+
 export default function EventForm({ calendarEventId, onClose }) {
   const clientRef = useRef();
   const dogRef = useRef();
@@ -128,6 +130,7 @@ export default function EventForm({ calendarEventId, onClose }) {
               placeholder="Napíšte poznámku k rezervácii..."
             />
           </div>
+          <PaymentForm />
           {/* Inline messages */}
           {message && !success && (
             <p className={`mt-2 font-semibold ${messageColor} text-center`}>

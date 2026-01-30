@@ -105,13 +105,13 @@ function HallReservation() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
-      }
+      },
     )
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
           setMessage(
-            "Rezervácia bola úspešne vytvorená, na mail vám bolo zaslané potvrdenie"
+            "Rezervácia bola úspešne vytvorená, na mail vám bolo zaslané potvrdenie",
           );
           setMessageColor("text-[var(--color-primary)]");
 
@@ -127,7 +127,6 @@ function HallReservation() {
         alert("Chyba pri komunikácii so serverom.");
       });
 
-    console.log(payload);
     setSubmitClicked(false);
   };
 
