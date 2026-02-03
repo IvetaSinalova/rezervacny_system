@@ -422,6 +422,14 @@ export default function EventCalendar({
                   })
                 : ""}
             </span>
+            {info.event.extendedProps.admin_note && (
+              <div
+                className="bg-white text-black text-sm font-normal m-0.5 p-0.5
+                overflow-hidden whitespace-nowrap text-ellipsis"
+              >
+                {info.event.extendedProps.admin_note}
+              </div>
+            )}
           </div>
         )}
       />
@@ -516,7 +524,7 @@ export default function EventCalendar({
                         </option>
 
                         {eventTypes?.map((type) => {
-                          if (!["16", "18", "19"].includes(type.id)) {
+                          if (!["16", "18", "19", "20"].includes(type.id)) {
                             return (
                               <option key={type.id} value={type.id}>
                                 {type.name}
@@ -578,6 +586,7 @@ export default function EventCalendar({
 
                     {selectedType &&
                       selectedType.admin === 1 &&
+                      selectedType.id != 25 &&
                       selectedEvent && (
                         <ReservationDetail
                           onPaymentChange={(attr, value, reservation_id) => {
@@ -734,26 +743,29 @@ export default function EventCalendar({
                       </div>
                     ))}
               </div>
-              {selectedType && selectedType.admin === 1 && !selectedEvent && (
-                <div>
-                  {loadReturnDogs && <Loading />}
+              {selectedType &&
+                selectedType.admin === 1 &&
+                selectedType.id == 14 &&
+                !selectedEvent && (
+                  <div>
+                    {loadReturnDogs && <Loading />}
 
-                  {/* Remove the ternary and use a style/class to hide the picker if needed, 
+                    {/* Remove the ternary and use a style/class to hide the picker if needed, 
         but it MUST stay in the tree */}
-                  <div className={loadReturnDogs ? "hidden" : "block"}>
-                    <ClientPicker
-                      longTermId={longTermId}
-                      updateLongTermId={(id) => setLongTermId(id)}
-                      updateLoadingReturnDog={(state) =>
-                        setLoadReturnDogs(state)
-                      }
-                      updateExistsReturnDog={(state) =>
-                        setExistsReturnDog(state)
-                      }
-                    />
+                    <div className={loadReturnDogs ? "hidden" : "block"}>
+                      <ClientPicker
+                        longTermId={longTermId}
+                        updateLongTermId={(id) => setLongTermId(id)}
+                        updateLoadingReturnDog={(state) =>
+                          setLoadReturnDogs(state)
+                        }
+                        updateExistsReturnDog={(state) =>
+                          setExistsReturnDog(state)
+                        }
+                      />
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
               {!selectedEvent ||
                 (selectedEvent && editType === "event" && (

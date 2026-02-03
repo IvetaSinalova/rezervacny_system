@@ -25,10 +25,15 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
     setLoading(true);
 
     try {
+      console.log(reservation);
       const reservation_id =
         reservation.reservation_type === "long_term"
           ? (reservation.long_term_reservation_id ?? reservation.reservation_id)
-          : reservation.event_reservation_id;
+          : reservation.reservation_id;
+      console.log(reservation_id);
+      console.log(reservation.reservation_type);
+      console.log(attr);
+      console.log(value);
       const response = await fetch(
         "https://www.psiaskola.sk/wp-json/events/v1/update-payment",
         {

@@ -63,7 +63,7 @@ export default function ParticipantsList({ reservations, onDelete, onAnnul }) {
 
                 {/* PAYMENT */}
                 <div
-                  className={`${r.is_paid === 1 ? "text-green-700" : "text-red-600"} mt-1 text-xl space-y-1 text-end`}
+                  className={`${r.is_paid === "1" ? "text-green-700" : "text-red-600"} mt-1 text-xl space-y-1 text-end`}
                 >
                   <div>{r.is_paid === "1" ? "Zaplatená" : "Nezaplatená"}</div>
 

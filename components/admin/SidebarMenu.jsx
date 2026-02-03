@@ -48,6 +48,10 @@ export default function SidebarMenu() {
           label: "Hotel s dlhodobým ubytovaním",
           href: "/admin/create-long-term-hotel-reservation",
         },
+        {
+          label: "Hala",
+          href: "/admin/hall-reservation",
+        },
       ],
     },
   ];
