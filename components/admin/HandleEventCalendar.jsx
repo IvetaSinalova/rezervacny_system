@@ -543,7 +543,8 @@ export default function EventCalendar({
                     selectedType.admin === 1 &&
                     existsReturnDog) ||
                     selectedType?.admin === 0 ||
-                    !selectedType)) ? (
+                    !selectedType)) ||
+                selectedType.id == 25 ? (
                   <div className="">
                     <label className="font-bold">
                       Začiatok:
