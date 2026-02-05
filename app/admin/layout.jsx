@@ -1,7 +1,7 @@
 // app/admin/layout.jsx
 
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth"; // cesta k novému súboru
+import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
 import AdminNavbar from "../../components/admin/AdminNavbar";
@@ -11,27 +11,29 @@ import { AdminDataProvider } from "../../context/AdminDataContext";
 export default async function AdminLayout({ children }) {
   const session = await getServerSession(authOptions);
 
-  // 1. Ak nie je prihlásený alebo nie je admin, layout vôbec nevykreslíme
   if (!session || session.user?.role !== "admin") {
-    // Ak ide o stránku login, nechceme redirect (aby sme sa vyhli slučke),
-    // ale vrátime len čisté deti (children) bez admin prvkov.
     return <>{children}</>;
   }
 
   return (
     <AdminDataProvider>
-      <AdminNavbar />
-      <div style={{ display: "flex", flex: "1 1 auto" }}>
-        <div
-          style={{
-            flex: "0 0 250px",
-            height: "calc(100vh - 85px)",
-            overflowY: "auto",
-          }}
-        >
-          <SidebarMenu />
+      {/* Wrapper to ensure the layout takes at least full screen height */}
+      <div className="min-h-screen flex flex-col">
+        <AdminNavbar />
+
+        <div className="flex flex-1">
+          {/* SIDEBAR WRAPPER */}
+          {/* hidden = 0px width on mobile. md:block = 250px on desktop */}
+          <aside className="hidden md:block w-[250px] sticky top-[80px] h-[calc(100vh-80px)] overflow-y-auto bg-white z-10 shadow-[4px_0_10px_-3px_rgba(0,0,0,0.1)]">
+            <SidebarMenu />
+          </aside>
+
+          {/* MAIN CONTENT */}
+          {/* flex-1 ensures it grows to fill all available space */}
+          <main className="flex-1 p-4 md:p-6 overflow-x-hidden">
+            {children}
+          </main>
         </div>
-        <div style={{ flex: "1 1 auto", padding: "1rem" }}>{children}</div>
       </div>
     </AdminDataProvider>
   );

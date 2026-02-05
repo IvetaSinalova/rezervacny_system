@@ -57,16 +57,7 @@ export default function SidebarMenu() {
   ];
 
   return (
-    <div
-      style={{
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        borderRight: "1px solid #ddd",
-        boxShadow: "2px 0 5px rgba(0,0,0,0.1)",
-        background: "#fff",
-      }}
-    >
+    <div className="hidden md:flex flex-col h-full bg-white border-r border-gray-200 shadow-md w-64">
       <ul style={{ margin: 0, padding: 0, listStyle: "none", flex: 1 }}>
         {menuItems.map((item) => (
           <li key={item.label}>

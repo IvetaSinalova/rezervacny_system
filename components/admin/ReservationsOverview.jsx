@@ -38,7 +38,7 @@ export default function ReservationsOverview({
           r.email,
           r.phone_number,
           r.dog_name,
-        ].some((v) => normalize(v).includes(normalize(search)))
+        ].some((v) => normalize(v).includes(normalize(search))),
       )
       .sort((a, b) => {
         if (sortOrder === "newest") {
@@ -52,7 +52,7 @@ export default function ReservationsOverview({
   // Memoized data
   const filteredReservations = useMemo(
     () => filterAndSort(reservations),
-    [reservations, search, sortOrder]
+    [reservations, search, sortOrder],
   );
 
   // Open modal
@@ -74,13 +74,13 @@ export default function ReservationsOverview({
         <input
           type="text"
           placeholder="Vyhľadávanie..."
-          className="border  px-4 py-2 w-full md:w-1/2"
+          className="border border-gray-500 px-4 py-2 w-full md:w-1/2 rounded-xl"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
 
         <select
-          className="border rounded-lg px-4 py-2"
+          className="border rounded-xl px-4 py-2 border-gray-500"
           value={sortOrder}
           onChange={(e) => setSortOrder(e.target.value)}
         >
@@ -125,8 +125,8 @@ export default function ReservationsOverview({
                     prev.map((r) =>
                       r.reservation_id === selectedReservation.reservation_id
                         ? { ...r, [attr]: value }
-                        : r
-                    )
+                        : r,
+                    ),
                   );
                 }}
               />

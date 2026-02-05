@@ -40,14 +40,15 @@ export default function MonthCalendar({
   function setFirstWeekDay(date) {
     const clicked = new Date(date);
 
-    // Make Monday = 0, Sunday = 6
-    const dayOfWeek = (clicked.getDay() + 6) % 7;
+    // // Make Monday = 0, Sunday = 6
+    // const dayOfWeek = (clicked.getDay() + 6) % 7;
 
-    // Calculate Monday of the same week
-    const weekStart = new Date(clicked);
-    weekStart.setDate(clicked.getDate() - dayOfWeek);
+    // // Calculate Monday of the same week
+    // const weekStart = new Date(clicked);
+    // weekStart.setDate(clicked.getDate() - dayOfWeek);
+    // 2. Check screen width
 
-    setNewInitialDate(weekStart);
+    setNewInitialDate(clicked);
   }
 
   return (

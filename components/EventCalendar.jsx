@@ -9,17 +9,17 @@ import "../styles/EventCalendar.css";
 import EventForm from "./forms/EventForm";
 import Loading from "./Loading";
 
-export default function EventCalendar({ alwaysReservable = false }) {
+export default function EventCalendar({ events, eventTypes, initialDate }) {
   const calendarRef = useRef(null);
   const [currentView, setCurrentView] = useState("timeGridWeek");
-  const [events, setEvents] = useState([]);
+  // const [events, setEvents] = useState(events);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedEventType, setSelectedEventType] = useState(null);
-  const [eventTypes, setEventTypes] = useState([]);
-  const [loading, setLoading] = useState(true);
+  //  const [eventTypes, setEventTypes] = useState(eventTypes);
+  //const [loading, setLoading] = useState(true);
 
   // Load event types and calendar events
-  useEffect(() => {
+  /* useEffect(() => {
     setLoading(true);
     Promise.all([
       fetch("https://psiaskola.sk/wp-json/events/v1/all-types-events").then(
@@ -54,6 +54,17 @@ export default function EventCalendar({ alwaysReservable = false }) {
         setLoading(false);
       });
   }, []);
+*/
+
+  useEffect(() => {
+    if (calendarRef.current) {
+      console.log(calendarRef.current.getApi());
+      const calendarApi = calendarRef.current.getApi();
+      queueMicrotask(() => {
+        calendarApi.gotoDate(initialDate);
+      });
+    }
+  }, [initialDate]);
 
   // Update selectedEventType when selectedEvent changes
   useEffect(() => {
@@ -87,20 +98,6 @@ export default function EventCalendar({ alwaysReservable = false }) {
     window.addEventListener("resize", updateView);
     return () => window.removeEventListener("resize", updateView);
   }, []);
-
-  if (loading)
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <Loading />
-      </div>
-    );
 
   return (
     <div className="relative w-full h-full">
@@ -156,6 +153,7 @@ export default function EventCalendar({ alwaysReservable = false }) {
           ref={calendarRef}
           plugins={[timeGridPlugin, interactionPlugin]}
           initialView={currentView}
+          initialDate={initialDate}
           headerToolbar={{ left: "today", center: "title", right: "prev,next" }}
           locale={skLocale}
           allDaySlot={false}

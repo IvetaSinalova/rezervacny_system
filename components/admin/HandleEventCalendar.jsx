@@ -796,9 +796,10 @@ export default function EventCalendar({
                   Zrušiť
                 </button>
 
-                {selectedEvent &&
+                {(selectedEvent &&
                   (!selectedType ||
-                    (selectedType && selectedType.admin == 0)) && (
+                    (selectedType && selectedType.admin == 0))) ||
+                  (selectedType.id == 25 && (
                     <button
                       type="button"
                       onClick={handleDelete}
@@ -806,7 +807,7 @@ export default function EventCalendar({
                     >
                       Zmazať
                     </button>
-                  )}
+                  ))}
 
                 <button type="submit" className="btn-save">
                   Uložiť
