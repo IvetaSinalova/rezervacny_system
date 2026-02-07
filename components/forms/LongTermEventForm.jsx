@@ -16,6 +16,7 @@ function LongTermEventForm({
   setModal,
   accommodationsPrice,
   price,
+  autofill = false,
 }) {
   const clientRef = useRef();
   const dogRef = useRef();
@@ -226,7 +227,7 @@ function LongTermEventForm({
             />
 
             {/* Client & Dog Forms */}
-            <ClientForm ref={clientRef} />
+            <ClientForm ref={clientRef} autofill={autofill} />
             <DogFormAllInfo ref={dogRef} />
             <CustomDropdown
               label="Vyberte druh ubytovania"

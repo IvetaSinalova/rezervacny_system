@@ -4,7 +4,11 @@ import { ClientForm } from "./ClientForm";
 import { DogFormAllInfo } from "./DogFormAllInfo";
 import PaymentForm from "./PaymentForm";
 
-export default function EventForm({ calendarEventId, onClose }) {
+export default function EventForm({
+  calendarEventId,
+  onClose,
+  autofill = false,
+}) {
   const clientRef = useRef();
   const dogRef = useRef();
   const [formData, setFormData] = useState({
@@ -24,7 +28,7 @@ export default function EventForm({ calendarEventId, onClose }) {
     const dogOk = dogRef.current.isValid();
     if (!clientOk || !dogOk || formData.trainingRequirements == "") {
       setMessage(
-        "Prosím, skontrolujte všetky polia. Zlé alebo nevyplnené údaje."
+        "Prosím, skontrolujte všetky polia. Zlé alebo nevyplnené údaje.",
       );
       setMessageColor("text-red-600");
       setIsLoading(false);
@@ -46,7 +50,7 @@ export default function EventForm({ calendarEventId, onClose }) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
-        }
+        },
       );
 
       const data = await res.json();
@@ -90,7 +94,7 @@ export default function EventForm({ calendarEventId, onClose }) {
       {/* Form */}
       {!success && (
         <div className="flex flex-col gap-4">
-          <ClientForm ref={clientRef} />
+          <ClientForm ref={clientRef} autofill={autofill} />
           <DogFormAllInfo ref={dogRef} />
 
           <div className="flex flex-col gap-1 shadow-xl bg-white p-6 rounded-2xl">

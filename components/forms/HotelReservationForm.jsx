@@ -16,6 +16,7 @@ function HotelReservationForm({
   trainingWalkPrice,
   accommodationsPrice,
   deselectDays,
+  autofill = false,
 }) {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -68,11 +69,11 @@ function HotelReservationForm({
   const timeRanges = getTimeRangesForDate(startDate);
 
   const startTimeOptions = getTimeRangesForDate(startDate).flatMap((range) =>
-    generateTimeOptions(range.from, range.to)
+    generateTimeOptions(range.from, range.to),
   );
 
   const endTimeOptions = getTimeRangesForDate(endDate ?? startDate).flatMap(
-    (range) => generateTimeOptions(range.from, range.to)
+    (range) => generateTimeOptions(range.from, range.to),
   );
 
   const [formData, setFormData] = useState({
@@ -108,7 +109,7 @@ function HotelReservationForm({
 
   function getAccommodationPrice(name) {
     const accommodation = accommodationsPrice.find(
-      (item) => item.name === name
+      (item) => item.name === name,
     );
     if (!accommodation) return 0; // not found
     const price = parseFloat(accommodation.price);
@@ -138,11 +139,11 @@ function HotelReservationForm({
       serviceName: serviceName,
       startDate: convertToMySQLDateTime(
         formatDate(startDate),
-        formData.startTime
+        formData.startTime,
       ),
       endDate: convertToMySQLDateTime(
         endDate ? formatDate(endDate) : formatDate(startDate),
-        formData.endTime
+        formData.endTime,
       ), // optional end time
       accommodation: formData.accommodation,
       note: formData.note || null,
@@ -158,7 +159,7 @@ function HotelReservationForm({
             "Content-Type": "application/json",
           },
           body: JSON.stringify(payload),
-        }
+        },
       );
 
       const result = await response.json();
@@ -171,7 +172,7 @@ function HotelReservationForm({
       }
 
       setMessage(
-        "Rezervácia bola úspešne vytvorená, na mail vám bolo zaslané potvrdenie"
+        "Rezervácia bola úspešne vytvorená, na mail vám bolo zaslané potvrdenie",
       );
       setMessageColor("text-[var(--color-primary)]");
 
@@ -252,7 +253,7 @@ function HotelReservationForm({
               }
             />
 
-            <ClientForm ref={clientRef} />
+            <ClientForm ref={clientRef} autofill={autofill} />
             <DogFormAllInfo ref={dogRef} />
 
             <CustomDropdown

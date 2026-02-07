@@ -10,7 +10,10 @@ import { ClientForm } from "./forms/ClientForm";
 import DogFormAllInfo from "./forms/DogFormAllInfo"; // your form component
 import LongTermEventForm from "./forms/LongTermEventForm";
 
-export default function AccommodationCalendar({ serviceName }) {
+export default function AccommodationCalendar({
+  serviceName,
+  autofill = false,
+}) {
   const today = new Date();
 
   const [month, setMonth] = useState(today);
@@ -261,6 +264,7 @@ export default function AccommodationCalendar({ serviceName }) {
               </button>
 
               <LongTermEventForm
+                autofill={autofill}
                 price={price}
                 setModal={(state) => {
                   setModalOpen(state);

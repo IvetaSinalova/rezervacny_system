@@ -9,7 +9,7 @@ import { ClientForm } from "./forms/ClientForm";
 import "react-time-picker/dist/TimePicker.css";
 import "../styles/EventCalendar.css";
 
-function HallReservation() {
+function HallReservation({ autofill = false }) {
   const [disabledDays, setDisabledDays] = useState([]);
   const [selectedDay, setSelectedDay] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -274,7 +274,7 @@ function HallReservation() {
 
                 {/* CLIENT FORM */}
 
-                <ClientForm ref={clientRef} />
+                <ClientForm ref={clientRef} autofill={autofill} />
 
                 <div className="flex flex-col gap-1 shadow-xl bg-white p-6 rounded-2xl">
                   <label className="font-semibold text-md">Poznámka</label>

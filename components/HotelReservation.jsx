@@ -7,7 +7,7 @@ import "../styles/EventCalendar.css";
 import Loading from "./Loading";
 import HotelReservationForm from "./forms/HotelReservationForm";
 
-export default function HotelReservation({ serviceName }) {
+export default function HotelReservation({ serviceName, autofill = false }) {
   const today = new Date();
   const isDailyService = serviceName?.includes("Denný");
   const [accommodations, setAccommodations] = useState({});
@@ -238,12 +238,12 @@ export default function HotelReservation({ serviceName }) {
     if (disabledDays.some((d) => d.toDateString() === day.toDateString()))
       return;
 
-    const key = formatDateKey(day);
+    const key = formatDateKey(day.from);
     const dayData = calendarData[key];
 
-    setSelectedDay(day);
+    setSelectedDay(day.from);
     setSelectedDayData(dayData.accommodations);
-    setFormDates({ startDate: day, endDate: day });
+    setFormDates({ startDate: day.from, endDate: day.from });
     setFormOpen(true);
     setModalOpen(true);
   };
@@ -429,6 +429,7 @@ export default function HotelReservation({ serviceName }) {
                 </button>
 
                 <HotelReservationForm
+                  autofill={autofill}
                   serviceName={serviceName}
                   startDate={formDates.startDate}
                   endDate={formDates.endDate}

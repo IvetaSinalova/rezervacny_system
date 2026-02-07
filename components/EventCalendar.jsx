@@ -9,7 +9,12 @@ import "../styles/EventCalendar.css";
 import EventForm from "./forms/EventForm";
 import Loading from "./Loading";
 
-export default function EventCalendar({ events, eventTypes, initialDate }) {
+export default function EventCalendar({
+  events,
+  eventTypes,
+  initialDate,
+  autofill = false,
+}) {
   const calendarRef = useRef(null);
   const [currentView, setCurrentView] = useState("timeGridWeek");
   // const [events, setEvents] = useState(events);
@@ -135,6 +140,7 @@ export default function EventCalendar({ events, eventTypes, initialDate }) {
             {/* Event Form */}
             <EventForm
               calendarEventId={selectedEvent.id}
+              autofill={autofill}
               onClose={() => setSelectedEvent(null)}
             />
           </div>

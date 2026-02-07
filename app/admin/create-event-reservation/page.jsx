@@ -72,6 +72,7 @@ export default function Home() {
         eventTypes={eventTypes}
         events={events}
         initialDate={initialDate}
+        autofill={true}
       />
     </div>
   );
