@@ -63,7 +63,6 @@ export default function EventCalendar({
 
   useEffect(() => {
     if (calendarRef.current) {
-      console.log(calendarRef.current.getApi());
       const calendarApi = calendarRef.current.getApi();
       queueMicrotask(() => {
         calendarApi.gotoDate(initialDate);
@@ -126,7 +125,7 @@ export default function EventCalendar({
                 {selectedEvent.start.toLocaleString()} -{" "}
                 {selectedEvent.end?.toLocaleString()}
               </p>
-              {selectedEventType && (
+              {/*selectedEventType && (
                 <>
                   <p className="text-md font-semibold">
                     Cena: {selectedEventType.price}€
@@ -135,14 +134,18 @@ export default function EventCalendar({
                     Počet lekcií: {selectedEventType.maxLessons}
                   </p>
                 </>
-              )}
+              )*/}
             </div>
             {/* Event Form */}
-            <EventForm
-              calendarEventId={selectedEvent.id}
-              autofill={autofill}
-              onClose={() => setSelectedEvent(null)}
-            />
+            {selectedEventType && (
+              <EventForm
+                calendarEventId={selectedEvent.id}
+                price={parseFloat(selectedEventType.price)}
+                maxLessons={parseFloat(selectedEventType.maxLessons)}
+                autofill={autofill}
+                onClose={() => setSelectedEvent(null)}
+              />
+            )}
           </div>
         </div>
       )}

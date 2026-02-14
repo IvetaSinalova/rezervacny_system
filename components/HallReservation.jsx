@@ -83,7 +83,7 @@ function HallReservation({ autofill = false }) {
 
   const handleSubmit = () => {
     setSubmitClicked(true);
-    //setDataSent(true);
+    setDataSent(true);
     setMessage("");
     const clientOk = clientRef.current.isValid();
     if (!clientOk || formData.startTime == "") {
@@ -111,15 +111,17 @@ function HallReservation({ autofill = false }) {
       .then((data) => {
         if (data.success) {
           setMessage(
-            "Rezervácia bola úspešne vytvorená, na mail vám bolo zaslané potvrdenie",
+            "Rezervácia bola úspešne vytvorená, na email vám bolo zaslané potvrdenie",
           );
           setMessageColor("text-[var(--color-primary)]");
 
           setSuccess(true);
+          setDataSent(false);
           setSubmitClicked();
         } else {
           console.error("Error:", data);
           alert("Chyba pri vytváraní rezervácie.");
+          setDataSent(false);
         }
       })
       .catch((err) => {
@@ -212,108 +214,110 @@ function HallReservation({ autofill = false }) {
               </div>
             </div>
           )}
-          {!success && (
-            <div className="relative bg-white w-full max-w-3xl h-screen overflow-y-auto rounded-none shadow-2xl p-8">
-              {/* CLOSE BUTTON */}
-              <button
-                onClick={hideModal}
-                className="absolute top-3 right-3 w-10 h-10 flex items-center justify-center rounded-full border border-[var(--color-secondary)] text-[var(--color-secondary)] text-2xl hover:bg-[var(--color-secondary)] hover:text-white transition-all"
-              >
-                ×
-              </button>
-              <div className="mb-6 border-b border-[var(--color-secondary)] pb-3 text-center">
-                <h2 className="text-xl font-bold mb-1">Rezervácia haly</h2>
-                <div className="font-bold text-lg">{formData.date}</div>
-              </div>
 
-              {/* FORM CONTENT */}
-              <div className="flex flex-col gap-6">
-                {/* START TIME */}
-                <div className="flex flex-col gap-2 p-6 bg-white rounded-2xl shadow">
-                  <label className="font-semibold text-sm">
-                    Začiatok rezervácie
-                  </label>
-                  <input
-                    type="time"
-                    value={formData.startTime}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        startTime: e.target.value,
-                      }))
-                    }
-                    className={`w-full border rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--color-tertiary)] ${
-                      formData.startTime == "" &&
-                      submitClicked &&
-                      "border-red-500"
-                    }`}
-                  />
-                  {formData.startTime == "" && submitClicked && (
-                    <div className="text-red-500">Pole je povinné</div>
-                  )}
-                </div>
-
-                {/* HOURS */}
-                <div className="flex flex-col gap-2 p-6 bg-white rounded-2xl shadow">
-                  <label className="font-semibold text-sm">Počet hodín</label>
-                  <input
-                    type="number"
-                    min={1}
-                    step={1}
-                    value={formData.hours}
-                    onWheel={(e) => e.target.blur()}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        hours: Number(e.target.value),
-                      }))
-                    }
-                    className="w-full border  rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--color-tertiary)]"
-                  />
-                </div>
-
-                {/* CLIENT FORM */}
-
-                <ClientForm ref={clientRef} autofill={autofill} />
-
-                <div className="flex flex-col gap-1 shadow-xl bg-white p-6 rounded-2xl">
-                  <label className="font-semibold text-md">Poznámka</label>
-                  <textarea
-                    value={formData.note}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        note: e.target.value,
-                      }))
-                    }
-                    className="border border-[var(--color-tertiary)] p-2 rounded-xl bg-white w-full resize-none"
-                  />
-                </div>
-
-                {/* PRICE */}
-                <div className="flex justify-between items-center p-6 bg-white rounded-2xl shadow font-bold text-lg">
-                  <span>Cena:</span>
-                  <span className="text-2xl">
-                    {formData.hours * hourPrice} €
-                  </span>
-                </div>
-
-                {/* SUBMIT BUTTON (OPTIONAL) */}
+          <div className="relative bg-white w-full max-w-3xl h-screen overflow-y-auto rounded-none shadow-2xl p-8">
+            {!success && (
+              <div>
                 <button
-                  onClick={handleSubmit}
-                  disabled={dataSent}
-                  className={`w-full p-3 rounded-2xl flex items-center justify-center gap-2
+                  onClick={hideModal}
+                  className="absolute top-3 right-3 w-10 h-10 flex items-center justify-center rounded-full border border-[var(--color-secondary)] text-[var(--color-secondary)] text-2xl hover:bg-[var(--color-secondary)] hover:text-white transition-all"
+                >
+                  ×
+                </button>
+                <div className="mb-6 border-b border-[var(--color-secondary)] pb-3 text-center">
+                  <h2 className="text-xl font-bold mb-1">Rezervácia haly</h2>
+                  <div className="font-bold text-lg">{formData.date}</div>
+                </div>
+
+                {/* FORM CONTENT */}
+                <div className="flex flex-col gap-6">
+                  {/* START TIME */}
+                  <div className="flex flex-col gap-2 p-6 bg-white rounded-2xl shadow">
+                    <label className="font-semibold text-sm">
+                      Začiatok rezervácie
+                    </label>
+                    <input
+                      type="time"
+                      value={formData.startTime}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          startTime: e.target.value,
+                        }))
+                      }
+                      className={`w-full border rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--color-tertiary)] ${
+                        formData.startTime == "" &&
+                        submitClicked &&
+                        "border-red-500"
+                      }`}
+                    />
+                    {formData.startTime == "" && submitClicked && (
+                      <div className="text-red-500">Pole je povinné</div>
+                    )}
+                  </div>
+
+                  {/* HOURS */}
+                  <div className="flex flex-col gap-2 p-6 bg-white rounded-2xl shadow">
+                    <label className="font-semibold text-sm">Počet hodín</label>
+                    <input
+                      type="number"
+                      min={1}
+                      step={1}
+                      value={formData.hours}
+                      onWheel={(e) => e.target.blur()}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          hours: Number(e.target.value),
+                        }))
+                      }
+                      className="w-full border  rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--color-tertiary)]"
+                    />
+                  </div>
+
+                  {/* CLIENT FORM */}
+
+                  <ClientForm ref={clientRef} autofill={autofill} />
+
+                  <div className="flex flex-col gap-1 shadow-xl bg-white p-6 rounded-2xl">
+                    <label className="font-semibold text-md">Poznámka</label>
+                    <textarea
+                      value={formData.note}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          note: e.target.value,
+                        }))
+                      }
+                      className="border border-[var(--color-tertiary)] p-2 rounded-xl bg-white w-full resize-none"
+                    />
+                  </div>
+
+                  {/* PRICE */}
+                  <div className="flex justify-between items-center p-6 bg-white rounded-2xl shadow font-bold text-lg">
+                    <span>Cena:</span>
+                    <span className="text-2xl">
+                      {formData.hours * hourPrice} €
+                    </span>
+                  </div>
+
+                  {/* SUBMIT BUTTON (OPTIONAL) */}
+                  <button
+                    onClick={handleSubmit}
+                    disabled={dataSent}
+                    className={`w-full p-3 rounded-2xl flex items-center justify-center gap-2
               bg-[var(--color-tertiary)] text-white
               ${dataSent ? "opacity-70 cursor-not-allowed" : ""}`}
-                >
-                  {dataSent && (
-                    <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  )}
-                  <span>{dataSent ? "Odosielam..." : "Odoslať"}</span>
-                </button>
+                  >
+                    {dataSent && (
+                      <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    )}
+                    <span>{dataSent ? "Odosielam..." : "Odoslať"}</span>
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       )}
     </div>

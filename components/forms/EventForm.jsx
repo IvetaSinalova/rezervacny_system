@@ -2,9 +2,10 @@
 import { useRef, useState } from "react";
 import { ClientForm } from "./ClientForm";
 import { DogFormAllInfo } from "./DogFormAllInfo";
-import PaymentForm from "./PaymentForm";
 
 export default function EventForm({
+  price,
+  maxLessons,
   calendarEventId,
   onClose,
   autofill = false,
@@ -54,16 +55,16 @@ export default function EventForm({
       );
 
       const data = await res.json();
-      // if (data.success) {
-      //   setMessage(
-      //     "Rezervácia bola úspešne vytvorená, na mail vám bolo zaslané potvrdenie"
-      //   );
-      //   setMessageColor("text-[var(--color-primary)]");
-      //   setSuccess(true);
-      // } else {
-      //   setMessage(data.message || "Nepodarilo sa vytvoriť rezerváciu");
-      //   setMessageColor("text-red-600");
-      // }
+      if (data.success) {
+        setMessage(
+          "Rezervácia bola úspešne vytvorená, na email vám bolo zaslané potvrdenie",
+        );
+        setMessageColor("text-[var(--color-primary)]");
+        setSuccess(true);
+      } else {
+        setMessage(data.message || "Nepodarilo sa vytvoriť rezerváciu");
+        setMessageColor("text-red-600");
+      }
       setIsLoading(false);
     } catch (err) {
       console.error(err);
@@ -134,7 +135,18 @@ export default function EventForm({
               placeholder="Napíšte poznámku k rezervácii..."
             />
           </div>
-          <PaymentForm />
+          <div className="flex w-full gap-1 shadow-xl bg-white p-6 rounded-2xl font-bold text-md">
+            <div className="text-xl">Cena:</div>
+
+            <div className="text-right flex flex-col flex-1">
+              <div className="text-xl">
+                {price.toFixed(2).replace(".", ",")}€
+              </div>
+              <div className="text-lg font-normal">
+                Počet lekcií: {maxLessons}
+              </div>
+            </div>
+          </div>
           {/* Inline messages */}
           {message && !success && (
             <p className={`mt-2 font-semibold ${messageColor} text-center`}>

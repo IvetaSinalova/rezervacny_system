@@ -284,7 +284,10 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
                   Cena:
                   <strong>
                     {" "}
-                    {reservation.accommodation_total_price}€
+                    {reservation.accommodation_total_price
+                      .toFixed(2)
+                      .replace(".", ",")}
+                    €
                   </strong>{" "}
                 </div>
               )}
@@ -307,7 +310,13 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
                 {reservation?.training_walks_price && (
                   <div>
                     Cena:
-                    <strong> {reservation.training_walks_price}€</strong>{" "}
+                    <strong>
+                      {" "}
+                      {reservation.training_walks_price
+                        .toFixed(2)
+                        .replace(".", ",")}
+                      €
+                    </strong>{" "}
                   </div>
                 )}
               </div>

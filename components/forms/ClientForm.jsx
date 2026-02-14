@@ -26,7 +26,7 @@ export const ClientForm = forwardRef(({ autofill }, ref) => {
     city: "Mesto",
     country: "Štát",
   };
-
+  const emailRegex = /^[\w.-]+@[\w.-]+\.[A-Za-z]{2,}$/;
   const sanitize = (value) => value.replace(/[-'";\\]/g, "");
 
   const handleChange = (e) => {
@@ -36,7 +36,9 @@ export const ClientForm = forwardRef(({ autofill }, ref) => {
     setErrors((prev) => ({ ...prev, [e.target.name]: "" })); // clear error on change
 
     if (e.target.name == "email" && autofill) {
-      getClientInfo(e.target.value);
+      if (emailRegex.test(sanitizedValue)) {
+        getClientInfo(e.target.value);
+      }
     }
   };
 
@@ -93,6 +95,16 @@ export const ClientForm = forwardRef(({ autofill }, ref) => {
 
       const data = await response.json();
       if (!response.ok) {
+        setClient({
+          firstName: "",
+          lastName: "",
+          email: data.email,
+          phone: "",
+          street: "",
+          zip: "",
+          city: "",
+          country: "",
+        });
         // This catches the WP_Error you sent from PHP
         throw new Error(data.message || "Something went wrong");
       }

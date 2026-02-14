@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { ClientForm } from "./ClientForm";
 import { DogFormAllInfo } from "./DogFormAllInfo";
 import CustomDropdown from "../CustomDropdown";
-import PaymentForm from "./PaymentForm";
 
 function LongTermEventForm({
   serviceName,
@@ -148,28 +147,28 @@ function LongTermEventForm({
 
       setIsLoading(false);
 
-      // if (!response.ok) {
-      //   setMessage(result.message || "Nastala chyba pri odosielaní.");
-      //   setMessageColor("text-red-600");
-      //   return;
-      // }
+      if (!response.ok) {
+        setMessage(result.message || "Nastala chyba pri odosielaní.");
+        setMessageColor("text-red-600");
+        return;
+      }
 
-      // setMessage(
-      //   "Rezervácia bola úspešne vytvorená, na mail vám bolo zaslané potvrdenie"
-      // );
-      // setMessageColor("text-[var(--color-primary)]");
+      setMessage(
+        "Rezervácia bola úspešne vytvorená, na email vám bolo zaslané potvrdenie",
+      );
+      setMessageColor("text-[var(--color-primary)]");
 
-      // setSuccess(true);
+      setSuccess(true);
 
-      // // Optionally reset form
-      // setFormData({
-      //   selectedTime: "",
-      //   accommodation: "",
-      //   note: "",
-      //   problems: "",
-      //   trainingRequirements: "",
-      //   note: "",
-      // });
+      // Optionally reset form
+      setFormData({
+        selectedTime: "",
+        accommodation: "",
+        note: "",
+        problems: "",
+        trainingRequirements: "",
+        note: "",
+      });
     } catch (error) {
       console.error(error);
       setMessage("Chyba pri odosielaní dát.");
@@ -303,28 +302,33 @@ function LongTermEventForm({
                 className="border border-[var(--color-tertiary)] p-2 rounded-xl bg-white w-full resize-none"
               />
             </div>
-            <PaymentForm />
 
             <div className="flex flex-col gap-1 shadow-xl bg-white p-6 rounded-2xl font-bold">
-              {accomodationPrice > 0 ? (
-                <div>
-                  <div className="text-xl">Cena:</div>
-                  <div className="text-right flex flex-col flex-1">
-                    <div className="font-normal">
-                      {formData.accommodation}: {accomodationPrice.toFixed(2)}€
+              <div className="flex w-full gap-1 shadow-xl bg-white p-6 rounded-2xl font-bold text-md">
+                <div className="text-xl">Cena:</div>
+
+                <div className="text-right flex flex-col flex-1">
+                  {accomodationPrice > 0 && (
+                    <div>
+                      <div className="font-normal">
+                        {formData.accommodation}:{" "}
+                        {accomodationPrice.toFixed(2).replace(".", ",")}€
+                      </div>
+                      <div className="font-normal">
+                        {serviceName}:{" "}
+                        {parseFloat(price).toFixed(2).replace(".", ",")}€
+                      </div>
                     </div>
-                    <div className="font-normal">
-                      {serviceName}: {parseFloat(price).toFixed(2)}€
-                    </div>
-                    Spolu: {(parseFloat(price) + accomodationPrice).toFixed(2)}€
+                  )}
+                  <div className="text-xl">
+                    {accomodationPrice > 0 && "Spolu: "}
+                    {(parseFloat(price) + accomodationPrice)
+                      .toFixed(2)
+                      .replace(".", ",")}
+                    €
                   </div>
                 </div>
-              ) : (
-                <div>
-                  {" "}
-                  Cena: {(parseFloat(price) + accomodationPrice).toFixed(2)}€
-                </div>
-              )}
+              </div>
             </div>
             {message && !success && (
               <p className={`mt-2 font-semibold ${messageColor} text-center`}>

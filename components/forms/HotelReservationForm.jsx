@@ -1,9 +1,8 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { ClientForm } from "./ClientForm";
 import { DogFormAllInfo } from "./DogFormAllInfo";
 import CustomDropdown from "../CustomDropdown";
-import PaymentForm from "./PaymentForm";
 
 function HotelReservationForm({
   pricePerDay,
@@ -19,6 +18,7 @@ function HotelReservationForm({
   autofill = false,
 }) {
   const [message, setMessage] = useState("");
+  const [numOfPaidDays, setNumOfPaidDays] = useState(numOfNights);
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [trainingWalkTotalPrice, setTrainingWalkTotalPrice] = useState(0);
@@ -48,25 +48,12 @@ function HotelReservationForm({
     return options;
   };
 
-  const getTimeRangesForDate = (dateStr) => {
-    const day = getDayOfWeek(dateStr);
-
-    // Saturday (6) or Sunday (0)
-    if (day === 0 || day === 6) {
-      return [
-        { from: "08:00", to: "10:00" },
-        { from: "18:00", to: "20:00" },
-      ];
-    }
-
-    // Monday–Friday
+  const getTimeRangesForDate = () => {
     return [
-      { from: "08:00", to: "15:00" },
+      { from: "08:00", to: "10:00" },
       { from: "18:00", to: "20:00" },
     ];
   };
-
-  const timeRanges = getTimeRangesForDate(startDate);
 
   const startTimeOptions = getTimeRangesForDate(startDate).flatMap((range) =>
     generateTimeOptions(range.from, range.to),
@@ -113,8 +100,16 @@ function HotelReservationForm({
     );
     if (!accommodation) return 0; // not found
     const price = parseFloat(accommodation.price);
-    setAccommodationPrice(isNaN(price) ? 0 : price * numOfNights);
+    setAccommodationPrice(isNaN(price) ? 0 : price * numOfPaidDays);
   }
+
+  useEffect(() => {
+    var totalDays = numOfNights;
+    if (formData.startTime < formData.endTime) {
+      totalDays += 1;
+    }
+    setNumOfPaidDays(totalDays);
+  }, [formData.startTime, formData.endTime]);
 
   const handleSubmit = async () => {
     setIsLoading(true);
@@ -172,7 +167,7 @@ function HotelReservationForm({
       }
 
       setMessage(
-        "Rezervácia bola úspešne vytvorená, na mail vám bolo zaslané potvrdenie",
+        "Rezervácia bola úspešne vytvorená, na email vám bolo zaslané potvrdenie",
       );
       setMessageColor("text-[var(--color-primary)]");
 
@@ -301,27 +296,33 @@ function HotelReservationForm({
                 className="border border-[var(--color-tertiary)] p-2 rounded-xl bg-white w-full resize-none"
               />
             </div>
-            <PaymentForm />
             <div className="flex w-full gap-1 shadow-xl bg-white p-6 rounded-2xl font-bold text-md">
               <div className="text-xl">Cena:</div>
 
               <div className="text-right flex flex-col flex-1">
                 {accomodationPrice > 0 && (
                   <div className="font-normal">
-                    {formData.accommodation}: {accomodationPrice}€
+                    {formData.accommodation}:{" "}
+                    {accomodationPrice.toFixed(2).replace(".", ",")}€
                   </div>
                 )}
                 <div className="font-normal">
-                  Výcviková vychádzka: {trainingWalkTotalPrice}€
+                  Výcviková vychádzka:{" "}
+                  {trainingWalkTotalPrice.toFixed(2).replace(".", ",")}€
                 </div>
                 <div className="font-normal">
-                  Ubytovanie: {pricePerDay * numOfNights}€
+                  Ubytovanie:{" "}
+                  {(pricePerDay * numOfPaidDays).toFixed(2).replace(".", ",")}€
                 </div>
                 <div className="text-xl">
                   Spolu:{" "}
-                  {trainingWalkTotalPrice +
-                    pricePerDay * numOfNights +
-                    accomodationPrice}
+                  {(
+                    trainingWalkTotalPrice +
+                    pricePerDay * numOfPaidDays +
+                    accomodationPrice
+                  )
+                    .toFixed(2)
+                    .replace(".", ",")}
                   €
                 </div>
               </div>
