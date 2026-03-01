@@ -41,12 +41,16 @@ export default function AdminNavbar() {
       ],
     },
     {
-      label: "Prehľad rezervácií",
+      label: "Prehľad",
       submenu: [
         { label: "Kurzy", href: "/admin/short-term-reservations-overview" },
         {
           label: "Dlhodobé ubytovanie",
           href: "/admin/long-term-reservations-overview",
+        },
+        {
+          label: "Tržby",
+          href: "/admin/reservation-stats",
         },
       ],
     },

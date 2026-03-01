@@ -32,6 +32,10 @@ export default function SidebarMenu() {
           label: "Dlhodobé ubytovanie a prevýchovy",
           href: "/admin/long-term-reservations-overview",
         },
+        {
+          label: "Tržby",
+          href: "/admin/reservation-stats",
+        },
       ],
     },
     {
