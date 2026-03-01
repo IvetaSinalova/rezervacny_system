@@ -24,7 +24,7 @@ export default async function AdminLayout({ children }) {
         <div className="flex flex-1">
           {/* SIDEBAR WRAPPER */}
           {/* hidden = 0px width on mobile. md:block = 250px on desktop */}
-          <aside className="hidden md:block w-[250px] sticky top-[80px] h-[calc(100vh-80px)] overflow-y-auto bg-white z-10 shadow-[4px_0_10px_-3px_rgba(0,0,0,0.1)]">
+          <aside className="hidden md:block sticky top-[80px] h-[calc(100vh-80px)] overflow-y-auto bg-white z-10 shadow-[4px_0_10px_-3px_rgba(0,0,0,0.1)]">
             <SidebarMenu />
           </aside>
 
