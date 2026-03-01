@@ -99,8 +99,14 @@ function HotelReservationForm({
       (item) => item.name === name,
     );
     if (!accommodation) return 0; // not found
+
+    var totalDays = numOfNights;
+    if (formData.startTime < formData.endTime) {
+      totalDays += 1;
+    }
+
     const price = parseFloat(accommodation.price);
-    setAccommodationPrice(isNaN(price) ? 0 : price * numOfPaidDays);
+    setAccommodationPrice(isNaN(price) ? 0 : price * totalDays);
   }
 
   useEffect(() => {
@@ -109,6 +115,9 @@ function HotelReservationForm({
       totalDays += 1;
     }
     setNumOfPaidDays(totalDays);
+    if (formData.accommodation) {
+      getAccommodationPrice(formData.accommodation);
+    }
   }, [formData.startTime, formData.endTime]);
 
   const handleSubmit = async () => {

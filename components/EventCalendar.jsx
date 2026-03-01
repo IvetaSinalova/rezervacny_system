@@ -62,6 +62,14 @@ export default function EventCalendar({
 */
 
   useEffect(() => {
+    if (selectedEvent) {
+      window.parent.postMessage({ type: "SHOW_MODAL" }, "*");
+    } else {
+      window.parent.postMessage({ type: "HIDE_MODAL" }, "*");
+    }
+  }, [selectedEvent]);
+
+  useEffect(() => {
     if (calendarRef.current) {
       const calendarApi = calendarRef.current.getApi();
       queueMicrotask(() => {
@@ -106,11 +114,25 @@ export default function EventCalendar({
   return (
     <div className="relative w-full h-full">
       {/* Modal overlay for selected event */}
-      {selectedEvent && <div className="fixed inset-0 bg-black/60 z-20"></div>}
+      {selectedEvent && <div className="fixed inset-0 z-20"></div>}
 
       {selectedEvent && (
-        <div className="fixed inset-0 z-30 flex items-start justify-center px-4">
-          <div className="relative bg-white p-6 shadow-xl w-full max-w-3xl h-[calc(100vh)] overflow-y-auto">
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(0, 0, 0, 0.6)", // The shadow inside the iframe
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+            overflowY: "auto", // Enables scrolling for the modal
+          }}
+        >
+          <div className="relative bg-white p-6 shadow-xl w-full max-w-3xl max-h-[100%] overflow-y-auto">
             {/* Close button */}
             <button
               onClick={() => setSelectedEvent(null)}

@@ -41,7 +41,7 @@ function LongTermEventForm({
 
     let startHour = fromM > 0 ? fromH + 1 : fromH;
     let endHour = toM > 0 ? toH - 1 : toH;
-    endHour = Math.max(startHour, endHour - 2);
+    endHour = Math.max(startHour, endHour - 1);
     endHour = Math.min(endHour, maxSelectableHour);
 
     for (let h = startHour; h <= endHour; h++) {

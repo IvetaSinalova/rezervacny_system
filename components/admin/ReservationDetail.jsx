@@ -8,14 +8,15 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
   const [reservation, setReservation] = useState(reservationProps);
   const [loading, setLoading] = useState(false);
 
-  const formatDateSK = (date) => {
+  const formatDateSK = (dateStr) => {
+    const date = new Date(dateStr);
     if (!date) return "";
 
-    return new Intl.DateTimeFormat("sk-SK", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    }).format(new Date(date));
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+
+    return `${day}.${month}. ${year}`;
   };
 
   const [isSaving, setIsSaving] = useState(false);
@@ -68,6 +69,8 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
     reservation?.last_name ?? ""
   }`;
 
+  console.log(reservation);
+
   return (
     <div className="w-full max-w-4xl mx-auto rounded-2xl  space-y-6">
       <div>
@@ -96,17 +99,18 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
         )}
         {reservation?.event_total_price &&
           reservation?.long_term_event_type_id !== "6" && (
-            <div className="text-center font-bold text-lg mt-5 mb-3">
+            <div className="text-center font-bold text-lg mt-2 mb-3">
               <div>{reservation.event_total_price}€</div>
-
-              <a
-                href={`https://moja.superfaktura.sk/invoices/pdf/${reservation.sf_id}`}
-                target="_blank"
-                className="underline font-normal"
-              >
-                {" "}
-                Stiahnuť faktúru{" "}
-              </a>
+              {reservation.sf_id && (
+                <a
+                  href={`https://moja.superfaktura.sk/invoices/pdf/${reservation.sf_id}`}
+                  target="_blank"
+                  className="underline font-normal"
+                >
+                  {" "}
+                  Stiahnuť faktúru{" "}
+                </a>
+              )}
             </div>
           )}
         <div className="text-center mt-3">
@@ -258,7 +262,7 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
           <div>Pohlavie: {reservation?.gender}</div>
           {reservation?.age && <div>Vek: {reservation.age}</div>}
           {reservation?.birth && (
-            <div>Dátum narodenia: {reservation.birth}</div>
+            <div>Dátum narodenia: {formatDateSK(reservation.birth)}</div>
           )}
           {reservation?.chip_number && (
             <div>Čip: {reservation.chip_number}</div>
@@ -278,18 +282,19 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
                 Názov ubytovania:{" "}
                 <strong>{reservation.accommodation_name}</strong>
               </div>
-
-              {reservation?.accommodation_total_price && (
+              {reservation?.accommodation_total_price &&
+              reservation.accommodation_total_price > 0 ? (
                 <div>
                   Cena:
                   <strong>
-                    {" "}
                     {reservation.accommodation_total_price
                       .toFixed(2)
                       .replace(".", ",")}
                     €
-                  </strong>{" "}
+                  </strong>
                 </div>
+              ) : (
+                ""
               )}
             </div>
           )}
@@ -302,7 +307,7 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
             <h3 className="font-semibold text-lg text-gray-700 mb-2">
               Doplnkové služby
             </h3>
-            {reservation?.training_walks && (
+            {reservation?.training_walks && reservation.training_walks != 0 && (
               <div className="flex w-full justify-between">
                 <div>
                   Počet tréningových vychádzok: {reservation.training_walks}
@@ -319,6 +324,22 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
                     </strong>{" "}
                   </div>
                 )}
+              </div>
+            )}
+            {reservation.long_term_special_requirements && (
+              <div className="mb-2">
+                <strong className="">Požiadavky na výcvik: </strong>
+                <div className="mt-1 bg-white p-2 rounded-xl border-2 border-gray-100 mb-2">
+                  {reservation.long_term_special_requirements}
+                </div>
+              </div>
+            )}
+            {reservation.problems && (
+              <div className="">
+                <strong>Problémy psa: </strong>
+                <div className="mt-1 bg-white p-2 rounded-xl border-2 border-gray-100">
+                  {reservation.problems}
+                </div>
               </div>
             )}
           </div>
@@ -341,7 +362,7 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
         reservation?.note) && (
         <div className="bg-gray-50 p-4 rounded-xl shadow-inner space-y-2">
           <h3 className="font-semibold text-lg text-gray-700 mb-2">Poznámka</h3>
-          <div>
+          <div className="mt-1 bg-white p-2 rounded-xl border-2 border-gray-100 mb-2">
             {reservation.long_term_note ||
               reservation.event_note ||
               reservation.note}

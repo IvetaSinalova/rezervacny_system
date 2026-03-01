@@ -29,6 +29,14 @@ function HallReservation({ autofill = false }) {
   const [loading, setLoading] = useState(false);
   const clientRef = useRef();
 
+  useEffect(() => {
+    if (modalOpen) {
+      window.parent.postMessage({ type: "SHOW_MODAL" }, "*");
+    } else {
+      window.parent.postMessage({ type: "HIDE_MODAL" }, "*");
+    }
+  }, [modalOpen]);
+
   /* Fetch disabled days + price */
   useEffect(() => {
     setLoading(true);
@@ -197,9 +205,23 @@ function HallReservation({ autofill = false }) {
 
       {/* MODAL */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(0, 0, 0, 0.6)", // The shadow inside the iframe
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+            overflowY: "auto", // Enables scrolling for the modal
+          }}
+        >
           {success && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+            <div className="fixed inset-0 z-50 flex items-center justify-center  p-4">
               <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center relative">
                 <p className={`font-semibold text-xl ${messageColor}`}>
                   {message}

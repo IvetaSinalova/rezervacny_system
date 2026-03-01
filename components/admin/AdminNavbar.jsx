@@ -59,10 +59,10 @@ export default function AdminNavbar() {
           href: "/admin/create-rehabilitation-reservation",
         },
         { label: "Výcvik", href: "/admin/create-training-reservation" },
-        { label: "Hotel", href: "/admin/create-hotel-reservation" },
+        { label: "Denný hotel", href: "/admin/create-daily-hotel-reservation" },
         {
-          label: "Hotel s ubytovaním",
-          href: "/admin/create-long-term-hotel-reservation",
+          label: "Hotel",
+          href: "/admin/create-hotel-reservation",
         },
         { label: "Hala", href: "/admin/hall-reservation" },
       ],

@@ -28,6 +28,14 @@ export default function HotelReservation({ serviceName, autofill = false }) {
   const [loading, setLoading] = useState(true);
   const [loadedMonths, setLoadedMonths] = useState([]); // track which months are already fetched
   const [prefetchingYear, setPrefetchingYear] = useState(false);
+
+  useEffect(() => {
+    if (modalOpen) {
+      window.parent.postMessage({ type: "SHOW_MODAL" }, "*");
+    } else {
+      window.parent.postMessage({ type: "HIDE_MODAL" }, "*");
+    }
+  }, [modalOpen]);
   // Build available + disabled day sets
   const buildDaySets = useCallback((dataArray, baseMonth) => {
     const dates = dataArray.map((d) => new Date(d.date));
@@ -248,6 +256,14 @@ export default function HotelReservation({ serviceName, autofill = false }) {
     setModalOpen(true);
   };
 
+  useEffect(() => {
+    if (modalOpen) {
+      window.parent.postMessage({ type: "SHOW_MODAL" }, "*");
+    } else {
+      window.parent.postMessage({ type: "HIDE_MODAL" }, "*");
+    }
+  }, [modalOpen]);
+
   const selectSingleDayFromMany = (from, to) => {
     if (!from || !to || from.getTime() >= to.getTime()) {
       console.warn("Invalid date range provided.");
@@ -353,6 +369,7 @@ export default function HotelReservation({ serviceName, autofill = false }) {
         style={{
           fontSize: "30px",
           padding: "10px 0px",
+          textAlign: "center",
           fontWeight: "bold",
           color: "var(--color-primary)",
         }}
@@ -404,11 +421,12 @@ export default function HotelReservation({ serviceName, autofill = false }) {
             left: 0,
             width: "100vw",
             height: "100vh",
-            backgroundColor: "rgba(0,0,0,0.6)",
+            backgroundColor: "rgba(0, 0, 0, 0.6)", // The shadow inside the iframe
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
             zIndex: 1000,
+            overflowY: "auto", // Enables scrolling for the modal
           }}
         >
           {" "}

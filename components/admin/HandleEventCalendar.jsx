@@ -27,7 +27,7 @@ export default function EventCalendar({
     eventTypeId: "",
     start: "",
     end: "",
-    maxCapacity: 10,
+    maxCapacity: 1,
     recurrence: "none", // none/daily/weekly
     recurringDays: [],
     repeatCount: 1, // for daily
@@ -97,7 +97,7 @@ export default function EventCalendar({
         start: formatDateForInput(event.start),
         end: formatDateForInput(event.end),
         note: event.extendedProps.note || null,
-        maxCapacity: event.extendedProps.maxCapacity || 10,
+        maxCapacity: event.extendedProps.maxCapacity || 1,
         admin_note: event.extendedProps.admin_note,
       });
     } else if (selection) {
@@ -107,7 +107,7 @@ export default function EventCalendar({
         eventTypeId: "",
         start: formatDateForInput(selection.start),
         end: formatDateForInput(selection.end),
-        maxCapacity: 10,
+        maxCapacity: 1,
         recurrence: "none",
         recurringDays: [],
         repeatCount: 1,
@@ -773,12 +773,13 @@ export default function EventCalendar({
                   <div className="bg-gray-50 p-4 rounded-xl shadow-inner space-y-2 mt-6">
                     <label className="font-semibold text-md ">
                       Poznámka pre admina:
+                      <div className="mt-1 "></div>
                       <textarea
                         value={formData.admin_note || ""}
                         onChange={(e) =>
                           handleChange("admin_note", e.target.value)
                         }
-                        className="input-field min-h-[100px] font-normal" // adjust 100px as needed
+                        className="min-h-[100px] font-normal bg-white p-2 rounded-xl border-2 border-gray-500 " // adjust 100px as needed
                       />
                     </label>
                   </div>

@@ -26,6 +26,17 @@ export const ClientForm = forwardRef(({ autofill }, ref) => {
     city: "Mesto",
     country: "Štát",
   };
+
+  const placeHolders = {
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "+421",
+    street: "",
+    zip: "",
+    city: "",
+    country: "",
+  };
   const emailRegex = /^[\w.-]+@[\w.-]+\.[A-Za-z]{2,}$/;
   const sanitize = (value) => value.replace(/[-'";\\]/g, "");
 
@@ -44,7 +55,7 @@ export const ClientForm = forwardRef(({ autofill }, ref) => {
 
   const validate = () => {
     const newErrors = {};
-
+    console.log(client);
     Object.keys(client).forEach((key) => {
       if (!client[key].trim()) newErrors[key] = "Pole je povinné";
     });
@@ -95,16 +106,6 @@ export const ClientForm = forwardRef(({ autofill }, ref) => {
 
       const data = await response.json();
       if (!response.ok) {
-        setClient({
-          firstName: "",
-          lastName: "",
-          email: data.email,
-          phone: "",
-          street: "",
-          zip: "",
-          city: "",
-          country: "",
-        });
         // This catches the WP_Error you sent from PHP
         throw new Error(data.message || "Something went wrong");
       }
@@ -135,6 +136,7 @@ export const ClientForm = forwardRef(({ autofill }, ref) => {
             <input
               name={key}
               value={client[key]}
+              placeholder={placeHolders[key]}
               onChange={handleChange}
               disabled={isLoading} // Form becomes read-only
               className={`p-2 rounded-xl bg-white border transition-colors ${

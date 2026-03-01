@@ -31,6 +31,14 @@ export default function AccommodationCalendar({
   const [modalOpen, setModalOpen] = useState(false);
   const [fixedDays, setFixedDays] = useState(0);
 
+  useEffect(() => {
+    if (modalOpen) {
+      window.parent.postMessage({ type: "SHOW_MODAL" }, "*");
+    } else {
+      window.parent.postMessage({ type: "HIDE_MODAL" }, "*");
+    }
+  }, [modalOpen]);
+
   const buildDaySets = useCallback((dataArray, baseMonth) => {
     const dates = dataArray.map((d) => new Date(d.date));
     const first = new Date(baseMonth.getFullYear(), baseMonth.getMonth(), 1);
@@ -242,11 +250,12 @@ export default function AccommodationCalendar({
             left: 0,
             width: "100vw",
             height: "100vh",
-            backgroundColor: "rgba(0,0,0,0.6)",
+            backgroundColor: "rgba(0, 0, 0, 0.6)", // The shadow inside the iframe
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
             zIndex: 1000,
+            overflowY: "auto", // Enables scrolling for the modal
           }}
         >
           <div className="fixed inset-0 z-30 flex items-start justify-center px-4">
@@ -276,7 +285,7 @@ export default function AccommodationCalendar({
                 accommodations={selectedDayData.accommodations}
                 startDate={selectedDay.toLocaleDateString("sk-SK")}
                 endDate={new Date(
-                  selectedDay.getTime() + fixedDays * 24 * 60 * 60 * 1000,
+                  selectedDay.getTime() + (fixedDays - 1) * 24 * 60 * 60 * 1000,
                 ).toLocaleDateString("sk-SK")}
               />
             </div>
