@@ -14,6 +14,7 @@ export default function EventCalendar({
   eventTypes,
   initialDate,
   autofill = false,
+  title = "Kalendár kurzov",
 }) {
   const calendarRef = useRef(null);
   const [currentView, setCurrentView] = useState("timeGridWeek");
@@ -172,7 +173,7 @@ export default function EventCalendar({
         </div>
       )}
       <div className="font-bold text-center text-3xl mt-8 mb-2 text-[var(--color-primary)]">
-        Kalendár kurzov
+        {title}
       </div>
       {/* Calendar */}
       <div

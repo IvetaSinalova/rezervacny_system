@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { toast } from "react-hot-toast";
 import "../../styles/EventCalendar.css";
 import Loading from "../Loading";
 function ReservationDetail({ reservationProps, onPaymentChange }) {
   const [reservation, setReservation] = useState(reservationProps);
   const [loading, setLoading] = useState(false);
-  console.log("in reservation detail");
+  const [initialLoad, setInitiaLoad] = useState(true);
+
   const formatDateSK = (dateStr) => {
     const date = new Date(dateStr);
     if (!date) return "";
@@ -22,11 +23,16 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    if (reservationProps?.start_date == null) {
-      reservation.start_date = reservationProps.long_term_start_date;
-      reservation.end_date = reservationProps.long_term_end_date;
-    }
+    setReservation(reservationProps);
   }, [reservationProps]);
+
+  useEffect(() => {
+    if (reservation?.reservation_type == "long_term") {
+      reservation.start_date = reservation.long_term_start_date;
+      reservation.end_date = reservation.long_term_end_date;
+      setInitiaLoad(false);
+    }
+  }, [reservation]);
 
   const handlePaymentChange = async (attr, value) => {
     setReservation((prev) => ({ ...prev, [attr]: value }));
@@ -70,6 +76,10 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
   const fullName = `${reservation?.first_name ?? ""} ${
     reservation?.last_name ?? ""
   }`;
+
+  if (initialLoad) {
+    <Loading />;
+  }
 
   return (
     <div className="w-full max-w-4xl mx-auto rounded-2xl  space-y-6">
