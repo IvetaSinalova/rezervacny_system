@@ -771,7 +771,7 @@ export default function EventCalendar({
               {!selectedEvent ||
                 (selectedEvent && editType === "event" && (
                   <div className="bg-gray-50 p-4 rounded-xl shadow-inner space-y-2 mt-6">
-                    <label className="font-semibold text-md ">
+                    <label className="font-semibold text-md text-gray-700 mb-2">
                       Poznámka pre admina:
                       <div className="mt-1 "></div>
                       <textarea

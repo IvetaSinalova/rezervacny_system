@@ -110,6 +110,7 @@ export default function HotelReservation({ serviceName, autofill = false }) {
         );
 
         const data = await response.json();
+        console.log(data);
         buildDaySets(data.availableDays, baseMonth);
         setPricePerDay(data.price);
         setTrainingWalkPrice(data.priceTrainingWalk);
@@ -382,7 +383,10 @@ export default function HotelReservation({ serviceName, autofill = false }) {
         onSelect={handleSelect}
         numberOfMonths={2}
         onDayMouseEnter={handleDayHover} // track hover
-        disabled={disabledDays}
+        disabled={[
+          ...disabledDays,
+          ...(autofill ? [] : [{ before: new Date().setHours(0, 0, 0, 0) }]),
+        ]}
         modifiers={{
           selected: range,
           hoverRange, // dynamic hover range

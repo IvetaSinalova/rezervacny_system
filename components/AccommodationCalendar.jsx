@@ -212,7 +212,7 @@ export default function AccommodationCalendar({
         disabled={[
           ...disabledDays,
           { dayOfWeek: [0, 6] },
-          { before: new Date().setHours(0, 0, 0, 0) },
+          ...(autofill ? [] : [{ before: new Date().setHours(0, 0, 0, 0) }]),
         ]}
         locale={sk}
         onDayClick={handleDayClick}

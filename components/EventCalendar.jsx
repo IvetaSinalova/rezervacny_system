@@ -14,7 +14,7 @@ export default function EventCalendar({
   eventTypes,
   initialDate,
   autofill = false,
-  title = "Kalendár kurzov",
+  title = "Kalendár kurzov a tréningov",
 }) {
   const calendarRef = useRef(null);
   const [currentView, setCurrentView] = useState("timeGridWeek");
