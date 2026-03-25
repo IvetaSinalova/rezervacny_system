@@ -84,9 +84,12 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
         zip: reservation.zip,
         city: reservation.city,
       };
-
+      console.log("data to update");
+      console.log(dataToUpdate);
       // 2. Loop through the entries and trigger the function for each
       Object.entries(dataToUpdate).forEach(([attr, value]) => {
+        console.log(attr);
+        console.log(value);
         // Only call it if the value actually exists
         if (value !== undefined && value !== null) {
           onPaymentChange(attr, value, reservation_id);

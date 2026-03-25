@@ -595,7 +595,6 @@ export default function EventCalendar({
                               prevEvents.map((event) => {
                                 // Only update the event that matches selectedEvent.id
                                 if (event.id !== selectedEvent.id) return event;
-
                                 return {
                                   ...event,
                                   reservations: event.reservations?.map(
