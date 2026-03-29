@@ -436,7 +436,16 @@ export default function EventCalendar({
 
       {modalVisible && (
         <div className="modal-overlay fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
-          <div className="modal bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[100vh] overflow-y-auto p-6">
+          <div className="relative bg-white p-6 shadow-xl w-full max-w-3xl h-[calc(100vh)] overflow-y-auto">
+            <button
+              onClick={() => {
+                setModalVisible(false);
+                setEditType("event");
+              }}
+              className="absolute top-3 right-3 w-10 h-10 flex items-center justify-center rounded-full border border-[var(--color-secondary)] text-[var(--color-secondary)] text-2xl hover:bg-[var(--color-secondary)] hover:text-white transition-all"
+            >
+              ×
+            </button>
             <form onSubmit={handleSubmit} className="modal-form">
               <h3
                 style={{
@@ -584,47 +593,6 @@ export default function EventCalendar({
                         </label>
                       </div>
                     )}
-
-                    {selectedType &&
-                      selectedType.admin === 1 &&
-                      selectedType.id != 25 &&
-                      selectedEvent && (
-                        <ReservationDetail
-                          onPaymentChange={(attr, value, reservation_id) => {
-                            setEvents((prevEvents) =>
-                              prevEvents.map((event) => {
-                                // Only update the event that matches selectedEvent.id
-                                if (event.id !== selectedEvent.id) return event;
-                                console.log(`updating ${selectedEvent.id}`);
-                                console.log(attr);
-                                console.log(value);
-                                return {
-                                  ...event,
-                                  reservations: event.reservations?.map(
-                                    (res) => {
-                                      const isTarget =
-                                        (res.long_term_reservation_id &&
-                                          res.long_term_reservation_id ===
-                                            reservation_id) ||
-                                        (res.event_reservation_id &&
-                                          res.event_reservation_id ===
-                                            reservation_id);
-
-                                      return isTarget
-                                        ? { ...res, [attr]: value }
-                                        : res;
-                                    },
-                                  ),
-                                };
-                              }),
-                            );
-                          }}
-                          reservationProps={
-                            selectedEvent?.extendedProps?.reservations?.[0] ||
-                            {}
-                          }
-                        />
-                      )}
                   </div>
                 ) : (
                   selectedType &&
@@ -788,17 +756,6 @@ export default function EventCalendar({
                 ))}
 
               <div className="modal-buttons mt-6">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setModalVisible(false);
-                    setEditType("event");
-                  }}
-                  className="btn-cancel"
-                >
-                  Zrušiť
-                </button>
-
                 {((selectedEvent &&
                   (!selectedType ||
                     (selectedType && selectedType.admin == 0))) ||
@@ -811,12 +768,58 @@ export default function EventCalendar({
                     Zmazať
                   </button>
                 )}
-
-                <button type="submit" className="btn-save">
-                  Uložiť
-                </button>
+                <div className="flex justify-end w-full">
+                  <button
+                    type="submit"
+                    disabled={submitBtnClicked} // Disable if saving OR if payment is loading
+                    className={`btn-save mt-4 px-6 py-2 text-white rounded-lg transition-all flex items-center gap-2 ${
+                      submitBtnClicked
+                        ? "opacity-50 cursor-not-allowed bg-gray-400"
+                        : "hover:opacity-90 bg-[var(--color-tertiary)]"
+                    }`}
+                  >
+                    {submitBtnClicked ? (
+                      <>
+                        <span className="animate-pulse">Ukladám...</span>
+                      </>
+                    ) : (
+                      "Uložiť"
+                    )}
+                  </button>
+                </div>
               </div>
             </form>
+            {selectedType &&
+              selectedType.admin === 1 &&
+              selectedType.id != 25 &&
+              selectedEvent && (
+                <ReservationDetail
+                  onPaymentChange={(attr, value, reservation_id) => {
+                    setEvents((prevEvents) =>
+                      prevEvents.map((event) => {
+                        // Only update the event that matches selectedEvent.id
+                        if (event.id !== selectedEvent.id) return event;
+                        return {
+                          ...event,
+                          reservations: event.reservations?.map((res) => {
+                            const isTarget =
+                              (res.long_term_reservation_id &&
+                                res.long_term_reservation_id ===
+                                  reservation_id) ||
+                              (res.event_reservation_id &&
+                                res.event_reservation_id === reservation_id);
+
+                            return isTarget ? { ...res, [attr]: value } : res;
+                          }),
+                        };
+                      }),
+                    );
+                  }}
+                  reservationProps={
+                    selectedEvent?.extendedProps?.reservations?.[0] || {}
+                  }
+                />
+              )}
 
             {submitBtnClicked && (
               <div className="mt-3">

@@ -44,7 +44,6 @@ const ReservationDashboard = () => {
       .then((json) => {
         setData(json);
         setLoading(false);
-        console.log(json);
       })
       .catch((err) => console.error("Chyba pri načítaní dát:", err));
   }, []);

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
-import EventCalendar from "../../components/EventCalendar.jsx";
-import MonthCalendar from "../../components/admin/MonthCalendar.jsx";
+import EventCalendar from "../../../components/EventCalendar.jsx";
+import MonthCalendar from "../../../components/admin/MonthCalendar.jsx";
 import Loading from "@/components/Loading.jsx";
 
 export default function Home() {
@@ -72,6 +72,7 @@ export default function Home() {
         eventTypes={eventTypes}
         events={events}
         initialDate={initialDate}
+        autofill={true}
       />
     </div>
   );

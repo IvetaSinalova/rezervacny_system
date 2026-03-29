@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { ClientForm } from "./ClientForm";
 import { DogFormAllInfo } from "./DogFormAllInfo";
 import CustomDropdown from "../CustomDropdown";
+import DiscountSection from "../DiscountSection";
 
 function HotelReservationForm({
   pricePerDay,
@@ -25,6 +26,7 @@ function HotelReservationForm({
   const [messageColor, setMessageColor] = useState("text-red-600");
   const [accomodationPrice, setAccommodationPrice] = useState(0);
   const clientRef = useRef();
+  const [discountInfo, setDiscountInfo] = useState(null);
   const dogRef = useRef();
   const getDayOfWeek = (date) => {
     // if date is a string, convert to Date
@@ -110,6 +112,10 @@ function HotelReservationForm({
   }
 
   useEffect(() => {
+    setDiscountInfo(null);
+  }, [formData?.trainingWalks, formData?.accommodation]);
+
+  useEffect(() => {
     var totalDays = numOfNights;
     if (formData.startTime < formData.endTime) {
       totalDays += 1;
@@ -152,6 +158,7 @@ function HotelReservationForm({
       accommodation: formData.accommodation,
       note: formData.note || null,
       trainingWalks: formData.trainingWalks,
+      code: discountInfo?.code ? discountInfo.code : "",
     };
 
     try {
@@ -305,8 +312,16 @@ function HotelReservationForm({
                 className="border border-[var(--color-tertiary)] p-2 rounded-xl bg-white w-full resize-none"
               />
             </div>
+            <DiscountSection
+              cartTotal={
+                trainingWalkTotalPrice +
+                pricePerDay * numOfPaidDays +
+                accomodationPrice
+              }
+              setReducedSum={setDiscountInfo}
+            />
             <div className="flex w-full gap-1 shadow-xl bg-white p-6 rounded-2xl font-bold text-md">
-              <div className="text-xl">Cena:</div>
+              <div className="text-xl">Prehľad:</div>
 
               <div className="text-right flex flex-col flex-1">
                 {accomodationPrice > 0 && (
@@ -324,7 +339,7 @@ function HotelReservationForm({
                   {(pricePerDay * numOfPaidDays).toFixed(2).replace(".", ",")}€
                 </div>
                 <div className="text-xl">
-                  Spolu:{" "}
+                  Cena:{" "}
                   {(
                     trainingWalkTotalPrice +
                     pricePerDay * numOfPaidDays +
@@ -334,6 +349,18 @@ function HotelReservationForm({
                     .replace(".", ",")}
                   €
                 </div>
+                {discountInfo && (
+                  <div className="flex flex-col items-end text-red-600 font-medium mt-1">
+                    <div className="text-md">
+                      Zľava: -{discountInfo.amount.toFixed(2).replace(".", ",")}
+                      €
+                    </div>
+                    <div className="text-xl font-bold">
+                      Cena po zľave:{" "}
+                      {discountInfo?.new_total?.toFixed(2).replace(".", ",")}€
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 

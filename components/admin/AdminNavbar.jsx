@@ -58,6 +58,7 @@ export default function AdminNavbar() {
       label: "Vytvoriť rezerváciu",
       submenu: [
         { label: "Kurz", href: "/admin/create-event-reservation" },
+        { label: "3 Day camp", href: "/admin/3day-camp-reservation" },
         {
           label: "Prevýchova",
           href: "/admin/create-rehabilitation-reservation",
@@ -69,6 +70,12 @@ export default function AdminNavbar() {
           href: "/admin/create-hotel-reservation",
         },
         { label: "Hala", href: "/admin/hall-reservation" },
+      ],
+    },
+    {
+      label: "Zľavy",
+      submenu: [
+        { label: "Spravovať zľavy", href: "/admin/discount-management" },
       ],
     },
   ];

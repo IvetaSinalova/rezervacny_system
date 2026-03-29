@@ -42,6 +42,7 @@ export default function SidebarMenu() {
       label: "Vytvoriť rezerváciu",
       submenu: [
         { label: "Kurz", href: "/admin/create-event-reservation" },
+        { label: "3 Day camp", href: "/admin/3day-camp-reservation" },
         {
           label: "Prevýchova",
           href: "/admin/create-rehabilitation-reservation",
@@ -58,10 +59,16 @@ export default function SidebarMenu() {
         },
       ],
     },
+    {
+      label: "Zľavy",
+      submenu: [
+        { label: "Spravovať zľavy", href: "/admin/discount-management" },
+      ],
+    },
   ];
 
   return (
-    <div className="hidden md:flex flex-col h-full bg-white border-r border-gray-200 shadow-md w-64">
+    <div className="hidden md:flex flex-col h-screen bg-white border-r border-gray-200 shadow-md w-64">
       <ul style={{ margin: 0, padding: 0, listStyle: "none", flex: 1 }}>
         {menuItems.map((item) => (
           <li key={item.label}>

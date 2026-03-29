@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { ClientForm } from "./ClientForm";
 import { DogFormAllInfo } from "./DogFormAllInfo";
 import CustomDropdown from "../CustomDropdown";
-
+import DiscountSection from "../DiscountSection";
 function LongTermEventForm({
   serviceName,
   numOfNights,
@@ -30,9 +30,14 @@ function LongTermEventForm({
     trainingRequirements: "",
     note: "",
   });
+  const [discountInfo, setDiscountInfo] = useState(null);
   const [accomodationPrice, setAccommodationPrice] = useState(0);
 
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setDiscountInfo(null);
+  }, [formData?.accommodation]);
 
   const generateTimeOptions = (from, to, maxSelectableHour = 15) => {
     const options = [];
@@ -129,6 +134,7 @@ function LongTermEventForm({
       problems: formData.problems,
       specialRequirements: formData.trainingRequirements, // map trainingRequirements to specialRequirements if needed
       trainingRequirements: formData.trainingRequirements,
+      code: discountInfo?.code ? discountInfo.code : "",
     };
 
     try {
@@ -303,31 +309,47 @@ function LongTermEventForm({
               />
             </div>
 
-            <div className="flex flex-col gap-1 shadow-xl bg-white p-6 rounded-2xl font-bold">
-              <div className="flex w-full gap-1 shadow-xl bg-white p-6 rounded-2xl font-bold text-md">
-                <div className="text-xl">Cena:</div>
+            <DiscountSection
+              cartTotal={parseFloat(price) + accomodationPrice}
+              setReducedSum={setDiscountInfo}
+              discountInfo={discountInfo}
+            />
 
-                <div className="text-right flex flex-col flex-1">
-                  {accomodationPrice > 0 && (
-                    <div>
-                      <div className="font-normal">
-                        {formData.accommodation}:{" "}
-                        {accomodationPrice.toFixed(2).replace(".", ",")}€
-                      </div>
-                      <div className="font-normal">
-                        {serviceName}:{" "}
-                        {parseFloat(price).toFixed(2).replace(".", ",")}€
-                      </div>
+            <div className="flex w-full gap-1 shadow-xl bg-white p-6 rounded-2xl font-bold text-md">
+              <div className="text-xl">Prehľad:</div>
+
+              <div className="text-right flex flex-col flex-1">
+                {accomodationPrice > 0 && (
+                  <div>
+                    <div className="font-normal">
+                      {formData.accommodation}:{" "}
+                      {accomodationPrice.toFixed(2).replace(".", ",")}€
                     </div>
-                  )}
-                  <div className="text-xl">
-                    {accomodationPrice > 0 && "Spolu: "}
-                    {(parseFloat(price) + accomodationPrice)
-                      .toFixed(2)
-                      .replace(".", ",")}
-                    €
+                    <div className="font-normal">
+                      {serviceName}:{" "}
+                      {parseFloat(price).toFixed(2).replace(".", ",")}€
+                    </div>
                   </div>
+                )}
+                <div className="text-xl">
+                  {accomodationPrice > 0 && "Cena: "}
+                  {(parseFloat(price) + accomodationPrice)
+                    .toFixed(2)
+                    .replace(".", ",")}
+                  €
                 </div>
+                {discountInfo && (
+                  <div className="flex flex-col items-end text-red-600 font-medium mt-1">
+                    <div className="text-md">
+                      Zľava: -{discountInfo.amount.toFixed(2).replace(".", ",")}
+                      €
+                    </div>
+                    <div className="text-xl font-bold">
+                      Cena po zľave:{" "}
+                      {discountInfo?.new_total?.toFixed(2).replace(".", ",")}€
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             {message && !success && (

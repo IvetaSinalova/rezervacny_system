@@ -2,6 +2,7 @@
 import { useRef, useState } from "react";
 import { ClientForm } from "./ClientForm";
 import { DogFormAllInfo } from "./DogFormAllInfo";
+import DiscountSection from "./../DiscountSection";
 
 export default function EventForm({
   price,
@@ -20,6 +21,8 @@ export default function EventForm({
   const [messageColor, setMessageColor] = useState("text-red-600");
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  // discountInfo will hold { amount, new_total } or null
+  const [discountInfo, setDiscountInfo] = useState(null);
 
   const handleSubmit = async () => {
     setMessage("");
@@ -42,6 +45,7 @@ export default function EventForm({
       dog: dogRef.current.getData(),
       note: formData.note,
       trainingRequirements: formData.trainingRequirements,
+      code: discountInfo?.code ? discountInfo.code : "",
     };
 
     try {
@@ -68,6 +72,7 @@ export default function EventForm({
       setIsLoading(false);
     } catch (err) {
       console.error(err);
+      setIsLoading(false);
       setMessage("Chyba servera. Skúste neskôr.");
       setMessageColor("text-red-600");
       setIsLoading(false);
@@ -135,16 +140,29 @@ export default function EventForm({
               placeholder="Napíšte poznámku k rezervácii..."
             />
           </div>
+
+          <DiscountSection cartTotal={price} setReducedSum={setDiscountInfo} />
           <div className="flex w-full gap-1 shadow-xl bg-white p-6 rounded-2xl font-bold text-md">
-            <div className="text-xl">Cena:</div>
+            <div className="text-xl">Prehľad:</div>
 
             <div className="text-right flex flex-col flex-1">
-              <div className="text-xl">
-                {price.toFixed(2).replace(".", ",")}€
-              </div>
               <div className="text-lg font-normal">
                 Počet lekcií: {maxLessons}
               </div>
+              <div className="text-xl">
+                Cena: {price.toFixed(2).replace(".", ",")}€
+              </div>
+              {discountInfo && (
+                <div className="flex flex-col items-end text-red-600 font-medium mt-1">
+                  <div className="text-md">
+                    Zľava: -{discountInfo.amount.toFixed(2).replace(".", ",")}€
+                  </div>
+                  <div className="text-xl font-bold">
+                    Cena po zľave:{" "}
+                    {discountInfo?.new_total?.toFixed(2).replace(".", ",")}€
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           {/* Inline messages */}

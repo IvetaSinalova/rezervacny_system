@@ -84,12 +84,9 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
         zip: reservation.zip,
         city: reservation.city,
       };
-      console.log("data to update");
-      console.log(dataToUpdate);
+
       // 2. Loop through the entries and trigger the function for each
       Object.entries(dataToUpdate).forEach(([attr, value]) => {
-        console.log(attr);
-        console.log(value);
         // Only call it if the value actually exists
         if (value !== undefined && value !== null) {
           onPaymentChange(attr, value, reservation_id);
@@ -132,7 +129,6 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
         birth: reservation.birth,
         gender: reservation.gender,
       };
-      Č;
 
       // 2. Loop through the entries and trigger the function for each
       Object.entries(dataToUpdate).forEach(([attr, value]) => {
@@ -187,7 +183,6 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
   if (initialLoad) {
     <Loading />;
   }
-  console.log(reservation);
 
   return (
     <div className="w-full max-w-4xl mx-auto rounded-2xl  space-y-6">
@@ -213,6 +208,12 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
                   reservation.end_date,
                 )}`
               : formatDateSK(reservation.start_date)}
+          </div>
+        )}
+        {reservation.extra_days && reservation.extra_days > 0 && (
+          <div className="text-red-500 text-xl font-bold text-center">
+            +{reservation.extra_days}{" "}
+            {reservation.extra_days > 1 ? "dní" : "deň"}
           </div>
         )}
         {reservation?.event_total_price &&
@@ -272,7 +273,11 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
                 setLoading(false);
               }
             }}
-            className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg"
+            className={`bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg  ${
+              isSaving || loading
+                ? "opacity-50 cursor-not-allowed bg-gray-400"
+                : "hover:opacity-90 bg-[var(--color-tertiary)]}"
+            } `}
           >
             Zrušiť rezerváciu
           </button>
@@ -631,17 +636,28 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
             )}
           </div>
         )}
-      {reservation?.special_requirements && (
-        <div className="bg-gray-50 p-4 rounded-xl shadow-inner space-y-2">
-          <h3 className="font-semibold text-md text-gray-700 mb-2">
-            Ďalšie informácie
-          </h3>
-          {reservation?.problems && <div>Problémy: {reservation.problems}</div>}
-          {reservation?.special_requirements && (
-            <div>Požiadavky na výcvik: {reservation.special_requirements}</div>
-          )}
-        </div>
-      )}
+      {reservation?.special_requirements ||
+        (reservation.problems && (
+          <div className="bg-gray-50 p-4 rounded-xl shadow-inner space-y-2">
+            <h3 className="font-semibold text-md text-gray-700 mb-2">
+              Ďalšie informácie
+            </h3>
+            {reservation?.problems && (
+              <div className="mb-2">
+                <div className="font-bold">Problémy:</div>{" "}
+                {reservation.problems}
+              </div>
+            )}
+            {reservation?.special_requirements ||
+              (reservation.long_term_special_requirements && (
+                <div>
+                  <div className="font-bold">Požiadavky na výcvik: </div>
+                  {reservation.special_requirements ||
+                    reservation.long_term_special_requirements}
+                </div>
+              ))}
+          </div>
+        ))}
 
       {/* Notes */}
       {(reservation?.long_term_note ||

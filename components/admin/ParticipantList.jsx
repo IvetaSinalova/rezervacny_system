@@ -26,7 +26,7 @@ export default function ParticipantsList({ reservations, onDelete, onAnnul }) {
     { key: "chip_number", label: "Čip" },
   ];
   return (
-    <div className="w-full max-h-[500px] overflow-y-auto space-y-3 p-2">
+    <div className="w-full  overflow-y-auto space-y-3 p-2">
       {reservations?.length > 0 ? (
         reservations.map((r) => {
           const fullName = `${r.first_name ?? ""} ${r.last_name ?? ""}`;

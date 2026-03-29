@@ -55,7 +55,6 @@ export const ClientForm = forwardRef(({ autofill }, ref) => {
 
   const validate = () => {
     const newErrors = {};
-    console.log(client);
     Object.keys(client).forEach((key) => {
       if (!client[key].trim()) newErrors[key] = "Pole je povinné";
     });
