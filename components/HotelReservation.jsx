@@ -110,7 +110,6 @@ export default function HotelReservation({ serviceName, autofill = false }) {
         );
 
         const data = await response.json();
-        console.log(data);
         buildDaySets(data.availableDays, baseMonth);
         setPricePerDay(data.price);
         setTrainingWalkPrice(data.priceTrainingWalk);

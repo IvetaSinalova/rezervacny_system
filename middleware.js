@@ -8,7 +8,7 @@ export default withAuth(
     const pathname = req.nextUrl.pathname;
 
     // If trying to access admin area without admin role
-    if (pathname.startsWith("/admin/dashboard") && !isAdmin) {
+    if (pathname.startsWith("/admin/overview") && !isAdmin) {
       return NextResponse.redirect(new URL("/admin/login", req.url));
     }
   },
