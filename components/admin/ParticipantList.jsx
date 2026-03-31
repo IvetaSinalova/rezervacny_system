@@ -25,6 +25,26 @@ export default function ParticipantsList({ reservations, onDelete, onAnnul }) {
     { key: "birth", label: "Dátum narodenia" },
     { key: "chip_number", label: "Čip" },
   ];
+
+  const formatValue = (key, value) => {
+    if (!isValid(value)) return value;
+
+    if (key === "birth") {
+      try {
+        const date = new Date(value);
+        if (isNaN(date.getTime())) return value; // Ak je neplatný dátum, vráť pôvodný
+
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+
+        return `${day}.${month}. ${year}`;
+      } catch (e) {
+        return value;
+      }
+    }
+    return value;
+  };
   return (
     <div className="w-full  overflow-y-auto space-y-3 p-2">
       {reservations?.length > 0 ? (
@@ -102,7 +122,7 @@ export default function ParticipantsList({ reservations, onDelete, onAnnul }) {
                     (f) =>
                       isValid(r[f.key]) && (
                         <p key={f.key} className="text-sm">
-                          <b>{f.label}:</b> {r[f.key]}
+                          <b>{f.label}:</b> {formatValue(f.key, r[f.key])}
                         </p>
                       ),
                   )}

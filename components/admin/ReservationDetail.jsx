@@ -9,6 +9,8 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitiaLoad] = useState(true);
 
+  console.log(reservation);
+
   const formatDateSK = (dateStr) => {
     const date = new Date(dateStr);
     if (!date) return "";
@@ -636,28 +638,26 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
             )}
           </div>
         )}
-      {reservation?.special_requirements ||
-        (reservation.problems && (
-          <div className="bg-gray-50 p-4 rounded-xl shadow-inner space-y-2">
-            <h3 className="font-semibold text-md text-gray-700 mb-2">
-              Ďalšie informácie
-            </h3>
-            {reservation?.problems && (
-              <div className="mb-2">
-                <div className="font-bold">Problémy:</div>{" "}
-                {reservation.problems}
-              </div>
-            )}
-            {reservation?.special_requirements ||
-              (reservation.long_term_special_requirements && (
-                <div>
-                  <div className="font-bold">Požiadavky na výcvik: </div>
-                  {reservation.special_requirements ||
-                    reservation.long_term_special_requirements}
-                </div>
-              ))}
-          </div>
-        ))}
+      {(reservation?.special_requirements || reservation.problems) && (
+        <div className="bg-gray-50 p-4 rounded-xl shadow-inner space-y-2">
+          <h3 className="font-semibold text-md text-gray-700 mb-2">
+            Ďalšie informácie
+          </h3>
+          {reservation?.problems && (
+            <div className="mb-2">
+              <div className="font-bold">Problémy:</div> {reservation.problems}
+            </div>
+          )}
+          {(reservation?.special_requirements ||
+            reservation.long_term_special_requirements) && (
+            <div>
+              <div className="font-bold">Požiadavky na výcvik: </div>
+              {reservation.special_requirements ||
+                reservation.long_term_special_requirements}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Notes */}
       {(reservation?.long_term_note ||
