@@ -553,7 +553,8 @@ export default function EventCalendar({
                     existsReturnDog) ||
                     selectedType?.admin === 0 ||
                     !selectedType)) ||
-                (selectedType && selectedType.id == 25) ? (
+                (selectedType &&
+                  (selectedType.id == 25 || selectedType.id == 26)) ? (
                   <div className="">
                     <label className="font-bold">
                       Začiatok:
@@ -759,7 +760,8 @@ export default function EventCalendar({
                 {((selectedEvent &&
                   (!selectedType ||
                     (selectedType && selectedType.admin == 0))) ||
-                  (selectedType && selectedType.id == 25)) && (
+                  (selectedType &&
+                    (selectedType.id == 25 || selectedType.id == 26))) && (
                   <button
                     type="button"
                     onClick={handleDelete}
@@ -792,6 +794,7 @@ export default function EventCalendar({
             {selectedType &&
               selectedType.admin === 1 &&
               selectedType.id != 25 &&
+              selectedType.id != 26 &&
               selectedEvent && (
                 <ReservationDetail
                   onPaymentChange={(attr, value, reservation_id) => {
