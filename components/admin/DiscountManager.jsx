@@ -9,7 +9,7 @@ const DiscountManager = () => {
   const [formData, setFormData] = useState({
     code: "",
     value: "",
-    type: "P",
+    type: "%",
     exp_date: "",
     sum_limit: 0,
     multiple_use: false,
@@ -49,7 +49,7 @@ const DiscountManager = () => {
         setFormData({
           code: "",
           value: "",
-          type: "P",
+          type: "%",
           exp_date: "",
           sum_limit: 0,
           multiple_use: false,
@@ -139,7 +139,7 @@ const DiscountManager = () => {
                   setFormData({ ...formData, type: e.target.value })
                 }
               >
-                <option value="P">Percentá (%)</option>
+                <option value="%">Percentá (%)</option>
                 <option value="€">Fixná suma (€)</option>
               </select>
             </div>
@@ -226,7 +226,7 @@ const DiscountManager = () => {
                   )}
                 </td>
                 <td className="p-5 font-medium text-gray-600">
-                  {d.value} {d.type === "P" ? "%" : "€"}
+                  {d.value} {d.type === "%" ? "%" : "€"}
                 </td>
                 <td className="p-5 text-gray-500 font-medium">
                   {new Date(d.exp_date).toLocaleDateString("sk-SK")}
