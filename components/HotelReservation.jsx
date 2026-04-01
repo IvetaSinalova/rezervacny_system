@@ -435,7 +435,7 @@ export default function HotelReservation({ serviceName, autofill = false }) {
           {" "}
           {formOpen && formDates ? (
             <div className="fixed inset-0 z-30 flex items-start justify-center px-4">
-              <div className="relative bg-white p-6 shadow-xl w-full max-w-3xl h-[calc(100vh)] overflow-y-auto">
+              <div className="relative bg-white p-6 shadow-xl w-full max-w-3xl h-[100dvh] overflow-y-auto">
                 {/* Close button */}
                 <button
                   onClick={() => {

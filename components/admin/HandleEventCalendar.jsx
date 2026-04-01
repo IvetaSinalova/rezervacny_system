@@ -768,7 +768,11 @@ export default function EventCalendar({
                   <button
                     type="button"
                     onClick={handleDelete}
-                    className="btn-delete"
+                    className={`btn-delete ${
+                      submitBtnClicked
+                        ? "opacity-50 cursor-not-allowed bg-gray-400"
+                        : "hover:opacity-90 bg-[var(--color-tertiary)]"
+                    }`}
                   >
                     Zmazať
                   </button>
