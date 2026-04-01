@@ -313,6 +313,8 @@ function LongTermEventForm({
               cartTotal={parseFloat(price) + accomodationPrice}
               setReducedSum={setDiscountInfo}
               discountInfo={discountInfo}
+              eventType="long_term"
+              serviceName={serviceName}
             />
 
             <div className="flex w-full gap-1 shadow-xl bg-white p-6 rounded-2xl font-bold text-md">

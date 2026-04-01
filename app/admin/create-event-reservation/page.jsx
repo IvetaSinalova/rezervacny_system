@@ -4,7 +4,7 @@ import EventCalendar from "../../../components/EventCalendar.jsx";
 import MonthCalendar from "../../../components/admin/MonthCalendar.jsx";
 import Loading from "@/components/Loading.jsx";
 
-export default function Home() {
+export default function page() {
   const [initialDate, setInitialDate] = useState(new Date());
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState([]);
@@ -17,6 +17,7 @@ export default function Home() {
   };
 
   useEffect(() => {
+    setLoading(true);
     Promise.all([
       fetch("https://psiaskola.sk/wp-json/events/v1/all-types-events").then(
         (res) => res.json(),

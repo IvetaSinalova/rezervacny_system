@@ -32,7 +32,7 @@ export default function LongTermEventTable() {
     }));
 
     setEvents((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
+      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
     );
   };
 
@@ -51,7 +51,7 @@ export default function LongTermEventTable() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(updates),
-        }
+        },
       );
       const data = await res.json();
       setLoading(false);
@@ -75,7 +75,7 @@ export default function LongTermEventTable() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(newEvent),
-        }
+        },
       );
       const data = await res.json();
       if (data.id) {
@@ -96,7 +96,7 @@ export default function LongTermEventTable() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ id }),
-        }
+        },
       );
       setEvents((prev) => prev.filter((item) => item.id !== id));
       setEditedEvents((prev) => {
@@ -159,6 +159,7 @@ export default function LongTermEventTable() {
                   <input
                     type="text"
                     value={item.name}
+                    readOnly
                     onChange={(e) =>
                       handleFieldChange(item.id, "name", e.target.value)
                     }

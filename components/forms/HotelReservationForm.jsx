@@ -318,6 +318,8 @@ function HotelReservationForm({
                 pricePerDay * numOfPaidDays +
                 accomodationPrice
               }
+              eventType="long_term"
+              serviceName={serviceName}
               setReducedSum={setDiscountInfo}
             />
             <div className="flex w-full gap-1 shadow-xl bg-white p-6 rounded-2xl font-bold text-md">

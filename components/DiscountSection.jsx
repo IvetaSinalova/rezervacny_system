@@ -1,7 +1,14 @@
 "use client";
 import React, { useEffect, useState } from "react";
 
-const DiscountSection = ({ cartTotal, setReducedSum, discountInfo = null }) => {
+const DiscountSection = ({
+  cartTotal,
+  setReducedSum,
+  eventType,
+  discountInfo = null,
+  serviceId = null,
+  serviceName = null,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [status, setStatus] = useState({
@@ -33,6 +40,9 @@ const DiscountSection = ({ cartTotal, setReducedSum, discountInfo = null }) => {
           body: JSON.stringify({
             code: promoCode,
             cartTotal: cartTotal,
+            serviceId: serviceId,
+            serviceName: serviceName,
+            eventType: eventType,
           }),
         },
       );

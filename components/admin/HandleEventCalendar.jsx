@@ -165,7 +165,8 @@ export default function EventCalendar({
       alert(
         `${reservationToDelete.first_name} ${reservationToDelete.last_name} bol úspešne odstránený z kurzu.`,
       );
-      window.location.reload();
+      const targetDate = formData.start.split("T")[0];
+      window.location.href = `/admin/overview?date=${targetDate}`;
       setModalVisible(false);
       setEditType("event");
       setReservationToDelete(null);
@@ -255,7 +256,8 @@ export default function EventCalendar({
     const result = await response.json();
 
     if (result.success) {
-      window.location.reload();
+      const targetDate = formData.start.split("T")[0];
+      window.location.href = `/admin/overview?date=${targetDate}`;
       setSubmitBtnClicked(false);
       setLongTermId(null);
     }
@@ -320,7 +322,8 @@ export default function EventCalendar({
             },
           ]);
         }
-        window.location.reload();
+        const targetDate = formData.start.split("T")[0];
+        window.location.href = `/admin/overview?date=${targetDate}`;
 
         setModalVisible(false);
       } else {
@@ -350,7 +353,8 @@ export default function EventCalendar({
       const data = await res.json();
       if (data.success) {
         setEvents((prev) => prev.filter((ev) => ev.id !== selectedEvent.id));
-        window.location.reload();
+        const targetDate = formData.start.split("T")[0];
+        window.location.href = `/admin/overview?date=${targetDate}`;
       }
     } catch (err) {
       console.error(err);

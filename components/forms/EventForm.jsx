@@ -141,7 +141,12 @@ export default function EventForm({
             />
           </div>
 
-          <DiscountSection cartTotal={price} setReducedSum={setDiscountInfo} />
+          <DiscountSection
+            cartTotal={price}
+            setReducedSum={setDiscountInfo}
+            eventType="short_term"
+            serviceId={calendarEventId}
+          />
           <div className="flex w-full gap-1 shadow-xl bg-white p-6 rounded-2xl font-bold text-md">
             <div className="text-xl">Prehľad:</div>
 
