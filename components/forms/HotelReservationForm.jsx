@@ -4,6 +4,7 @@ import { ClientForm } from "./ClientForm";
 import { DogFormAllInfo } from "./DogFormAllInfo";
 import CustomDropdown from "../CustomDropdown";
 import DiscountSection from "../DiscountSection";
+import InvoiceToggle from "../InvoiceToggle";
 
 function HotelReservationForm({
   pricePerDay,
@@ -28,10 +29,15 @@ function HotelReservationForm({
   const clientRef = useRef();
   const [discountInfo, setDiscountInfo] = useState(null);
   const dogRef = useRef();
+  const [needsInvoice, setNeedsInvoice] = useState(false);
   const getDayOfWeek = (date) => {
     // if date is a string, convert to Date
     const d = typeof date === "string" ? new Date(date) : date;
     return d.getDay(); // 0 = Sunday, 6 = Saturday
+  };
+
+  const handleInvoiceToggle = (value) => {
+    setNeedsInvoice(value);
   };
 
   const formatDate = (date) =>
@@ -159,6 +165,7 @@ function HotelReservationForm({
       note: formData.note || null,
       trainingWalks: formData.trainingWalks,
       code: discountInfo?.code ? discountInfo.code : "",
+      needsInvoice: needsInvoice,
     };
 
     try {
@@ -365,6 +372,8 @@ function HotelReservationForm({
                 )}
               </div>
             </div>
+
+            {autofill && <InvoiceToggle onChange={handleInvoiceToggle} />}
 
             <button
               onClick={handleSubmit}

@@ -15,6 +15,7 @@ export default function EventCalendar({
   initialDate,
   autofill = false,
   title = "Kalendár kurzov a tréningov",
+  invoiceGenerated = false,
 }) {
   const calendarRef = useRef(null);
   const [currentView, setCurrentView] = useState("timeGridWeek");
@@ -167,6 +168,7 @@ export default function EventCalendar({
                 maxLessons={parseFloat(selectedEventType.maxLessons)}
                 autofill={autofill}
                 onClose={() => setSelectedEvent(null)}
+                invoiceGenerated={invoiceGenerated}
               />
             )}
           </div>

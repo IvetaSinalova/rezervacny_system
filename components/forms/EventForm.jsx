@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import { ClientForm } from "./ClientForm";
 import { DogFormAllInfo } from "./DogFormAllInfo";
 import DiscountSection from "./../DiscountSection";
+import InvoiceToggle from "../InvoiceToggle";
 
 export default function EventForm({
   price,
@@ -10,6 +11,7 @@ export default function EventForm({
   calendarEventId,
   onClose,
   autofill = false,
+  invoiceGenerated = false,
 }) {
   const clientRef = useRef();
   const dogRef = useRef();
@@ -21,8 +23,13 @@ export default function EventForm({
   const [messageColor, setMessageColor] = useState("text-red-600");
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [needsInvoice, setNeedsInvoice] = useState(false);
   // discountInfo will hold { amount, new_total } or null
   const [discountInfo, setDiscountInfo] = useState(null);
+
+  const handleInvoiceToggle = (value) => {
+    setNeedsInvoice(value);
+  };
 
   const handleSubmit = async () => {
     setMessage("");
@@ -46,6 +53,7 @@ export default function EventForm({
       note: formData.note,
       trainingRequirements: formData.trainingRequirements,
       code: discountInfo?.code ? discountInfo.code : "",
+      needsInvoice: needsInvoice,
     };
 
     try {
@@ -176,6 +184,7 @@ export default function EventForm({
               {message}
             </p>
           )}
+          {invoiceGenerated && <InvoiceToggle onChange={handleInvoiceToggle} />}
           <button
             onClick={handleSubmit}
             disabled={isLoading}

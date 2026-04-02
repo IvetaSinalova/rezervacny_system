@@ -4,6 +4,8 @@ import { ClientForm } from "./ClientForm";
 import { DogFormAllInfo } from "./DogFormAllInfo";
 import CustomDropdown from "../CustomDropdown";
 import DiscountSection from "../DiscountSection";
+import InvoiceToggle from "../InvoiceToggle";
+
 function LongTermEventForm({
   serviceName,
   numOfNights,
@@ -32,12 +34,17 @@ function LongTermEventForm({
   });
   const [discountInfo, setDiscountInfo] = useState(null);
   const [accomodationPrice, setAccommodationPrice] = useState(0);
+  const [needsInvoice, setNeedsInvoice] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setDiscountInfo(null);
   }, [formData?.accommodation]);
+
+  const handleInvoiceToggle = (value) => {
+    setNeedsInvoice(value);
+  };
 
   const generateTimeOptions = (from, to, maxSelectableHour = 15) => {
     const options = [];
@@ -135,6 +142,7 @@ function LongTermEventForm({
       specialRequirements: formData.trainingRequirements, // map trainingRequirements to specialRequirements if needed
       trainingRequirements: formData.trainingRequirements,
       code: discountInfo?.code ? discountInfo.code : "",
+      needsInvoice: needsInvoice,
     };
 
     try {
@@ -359,6 +367,7 @@ function LongTermEventForm({
                 {message}
               </p>
             )}
+            {autofill && <InvoiceToggle onChange={handleInvoiceToggle} />}
             <button
               onClick={handleSubmit}
               disabled={isLoading}

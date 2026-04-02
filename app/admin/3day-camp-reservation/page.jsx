@@ -73,6 +73,7 @@ export default function Home() {
         events={events}
         initialDate={initialDate}
         autofill={true}
+        invoiceGenerated={true}
       />
     </div>
   );
