@@ -134,7 +134,7 @@ export default function EventCalendar({
             overflowY: "auto", // Enables scrolling for the modal
           }}
         >
-          <div className="relative bg-white p-6 shadow-xl w-full max-w-3xl max-h-[100%] overflow-y-auto">
+          <div className="relative bg-white p-6 shadow-xl w-full max-w-3xl h-[100dvh] overflow-y-auto">
             {/* Close button */}
             <button
               onClick={() => setSelectedEvent(null)}

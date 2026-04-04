@@ -423,7 +423,7 @@ export default function HotelReservation({ serviceName, autofill = false }) {
             top: 0,
             left: 0,
             width: "100vw",
-            height: "100vh",
+            height: "100%",
             backgroundColor: "rgba(0, 0, 0, 0.6)", // The shadow inside the iframe
             display: "flex",
             justifyContent: "center",

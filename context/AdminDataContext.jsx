@@ -10,8 +10,9 @@ export function AdminDataProvider({ children }) {
   const [accomodations, setAccomodations] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (events.length > 0 && eventTypes.length > 0) {
+  const fetchAdminData = async () => {
+    setLoading(true);
+    if (events?.length > 0 && eventTypes?.length > 0) {
       setLoading(false);
       return;
     }
@@ -38,11 +39,23 @@ export function AdminDataProvider({ children }) {
         console.error(err);
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    setEvents([]);
+    setEventTypes([]);
+    fetchAdminData();
   }, []);
 
   return (
     <AdminDataContext.Provider
-      value={{ events, eventTypes, loading, accomodations }}
+      value={{
+        events,
+        eventTypes,
+        loading,
+        accomodations,
+        refreshData: fetchAdminData,
+      }}
     >
       {children}
     </AdminDataContext.Provider>

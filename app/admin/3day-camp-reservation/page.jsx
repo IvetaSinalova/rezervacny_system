@@ -51,7 +51,7 @@ export default function Home() {
 
   if (loading)
     return (
-      <div className="h-screen">
+      <div className="h-[100dvh]">
         <Loading />
       </div>
     );

@@ -34,8 +34,8 @@ function LongTermEventForm({
   });
   const [discountInfo, setDiscountInfo] = useState(null);
   const [accomodationPrice, setAccommodationPrice] = useState(0);
-  const [needsInvoice, setNeedsInvoice] = useState(false);
-
+  const [needsInvoice, setNeedsInvoice] = useState(true);
+  const [usedTimes, setUsedTimes] = useState([]); //save time that was used to create event and then dont display it anymore
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -166,7 +166,7 @@ function LongTermEventForm({
         setMessageColor("text-red-600");
         return;
       }
-
+      setUsedTimes((prev) => [...prev, formData.selectedTime]);
       setMessage(
         "Rezervácia bola úspešne vytvorená, na email vám bolo zaslané potvrdenie",
       );
@@ -190,6 +190,11 @@ function LongTermEventForm({
       setIsLoading(false);
     }
   };
+
+  const allOptions = availableTimes.flatMap((time) =>
+    generateTimeOptions(time.from, time.to),
+  );
+  const filteredOptions = allOptions.filter((opt) => !usedTimes.includes(opt));
 
   return (
     <div>
@@ -231,9 +236,7 @@ function LongTermEventForm({
             <CustomDropdown
               label="Vyberte čas odovzdania psa"
               value={formData.selectedTime}
-              options={availableTimes.flatMap((time) =>
-                generateTimeOptions(time.from, time.to),
-              )}
+              options={filteredOptions}
               onSelect={(selected) =>
                 setFormData((prev) => ({ ...prev, selectedTime: selected }))
               }

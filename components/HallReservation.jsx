@@ -237,7 +237,7 @@ function HallReservation({ autofill = false }) {
             </div>
           )}
 
-          <div className="relative bg-white w-full max-w-3xl h-screen overflow-y-auto rounded-none shadow-2xl p-8">
+          <div className="relative bg-white w-full max-w-3xl h-[100dvh] overflow-y-auto rounded-none shadow-2xl p-8">
             {!success && (
               <div>
                 <button

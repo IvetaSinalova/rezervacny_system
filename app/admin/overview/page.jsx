@@ -2,14 +2,15 @@
 "use client";
 import { useState, useEffect, useContext } from "react";
 import { useSearchParams } from "next/navigation"; // Add this
-import AdminLayout from "../layout.jsx";
 import MonthCalendar from "../../../components/admin/MonthCalendar.jsx";
 import HandleEventCalendar from "../../../components/admin/HandleEventCalendar.jsx";
-import { AdminDataContext } from "../../../context/AdminDataContext.jsx";
 import Loading from "../../../components/Loading.jsx";
 
 export default function OverviewPage() {
-  const { events, eventTypes, loading } = useContext(AdminDataContext);
+  const [events, setEvents] = useState([]);
+  const [eventTypes, setEventTypes] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const searchParams = useSearchParams();
 
   // Initialize state: Check URL for date, otherwise use today
@@ -24,6 +25,33 @@ export default function OverviewPage() {
       }
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    setLoading(true);
+    if (events?.length > 0 && eventTypes?.length > 0) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    Promise.all([
+      fetch(
+        "https://psiaskola.sk/wp-json/events/v1/all-types-events-admin",
+      ).then((res) => res.json()),
+      fetch(
+        "https://psiaskola.sk/wp-json/events/v1/all-calendar-events-with-clients",
+      ).then((res) => res.json()),
+    ])
+      .then(([types, eventsData]) => {
+        setEventTypes(types);
+        setEvents(eventsData);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, []);
 
   const setNewInitialDate = (newDate) => {
     if (newDate.getTime() !== initialDate.getTime()) {

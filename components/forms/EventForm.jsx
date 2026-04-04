@@ -23,7 +23,7 @@ export default function EventForm({
   const [messageColor, setMessageColor] = useState("text-red-600");
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [needsInvoice, setNeedsInvoice] = useState(false);
+  const [needsInvoice, setNeedsInvoice] = useState(true);
   // discountInfo will hold { amount, new_total } or null
   const [discountInfo, setDiscountInfo] = useState(null);
 
