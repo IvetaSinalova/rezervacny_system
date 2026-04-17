@@ -26,12 +26,20 @@ export default withAuth(
 // Only protect these specific routes
 export const config = {
   matcher: [
-    "/admin/dashboard/:path*",
-    "/admin/overview/:path*",
-    "/admin/manage-events/:path*",
+    "/admin/3day-camp-reservation/:path*",
     "/admin/accomodation/:path*",
-    "/admin/update-long-term-events/:path*",
-    "/admin/short-term-reservations-overview/:path*",
+    "/admin/create-daily-hotel-reservation/:path*",
+    "/admin/create-event-reservation/:path*",
+    "/admin/create-hotel-reservation/:path*",
+    "/admin/create-rehabilitation-reservation/:path*",
+    "/admin/create-training-reservation/:path*",
+    "/admin/discount-management/:path*",
+    "/admin/hall-reservation/:path*",
     "/admin/long-term-reservations-overview/:path*",
+    "/admin/manage-events/:path*",
+    "/admin/overview/:path*",
+    "/admin/reservation-stats/:path*",
+    "/admin/short-term-reservations-overview/:path*",
+    "/admin/update-long-term-events/:path*",
   ],
 };

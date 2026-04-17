@@ -5,6 +5,7 @@ import { DogFormAllInfo } from "./DogFormAllInfo";
 import CustomDropdown from "../CustomDropdown";
 import DiscountSection from "../DiscountSection";
 import InvoiceToggle from "../InvoiceToggle";
+import "../../styles/EventCalendar.css";
 
 function HotelReservationForm({
   pricePerDay,
@@ -215,7 +216,7 @@ function HotelReservationForm({
   };
 
   return (
-    <div>
+    <div className="mobile-footer-spacing">
       {success && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
           <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center relative">
@@ -230,7 +231,6 @@ function HotelReservationForm({
           </div>
         </div>
       )}
-
       {!success && (
         <div>
           {/* Event Info Header */}
@@ -378,7 +378,7 @@ function HotelReservationForm({
             <button
               onClick={handleSubmit}
               disabled={isLoading}
-              className={`w-full p-3 rounded-2xl flex items-center justify-center gap-2
+              className={`w-full fixed-bottom-button-container p-3 rounded-2xl flex items-center justify-center gap-2
               bg-[var(--color-tertiary)] text-white
               ${isLoading ? "opacity-70 cursor-not-allowed" : ""}`}
             >

@@ -5,6 +5,7 @@ import { DogFormAllInfo } from "./DogFormAllInfo";
 import CustomDropdown from "../CustomDropdown";
 import DiscountSection from "../DiscountSection";
 import InvoiceToggle from "../InvoiceToggle";
+import "../../styles/EventCalendar.css";
 
 function LongTermEventForm({
   serviceName,
@@ -197,7 +198,7 @@ function LongTermEventForm({
   const filteredOptions = allOptions.filter((opt) => !usedTimes.includes(opt));
 
   return (
-    <div>
+    <div className="mobile-footer-spacing">
       {success && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
           <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center relative">
@@ -260,7 +261,7 @@ function LongTermEventForm({
             />
 
             {/* Note */}
-            <div className="flex flex-col gap-1 shadow-xl bg-white p-6 rounded-2xl">
+            {/* <div className="flex flex-col gap-1 shadow-xl bg-white p-6 rounded-2xl">
               <label className="font-semibold text-md">Problémy psa</label>
               <textarea
                 value={formData.problems}
@@ -279,7 +280,7 @@ function LongTermEventForm({
               {formData.problems.trim() === "" && message && (
                 <p className="text-red-500 text-sm">Pole je povinné</p>
               )}
-            </div>
+            </div> */}
 
             {/* Training Requirements */}
             <div className="flex flex-col gap-1 shadow-xl bg-white p-6 rounded-2xl">

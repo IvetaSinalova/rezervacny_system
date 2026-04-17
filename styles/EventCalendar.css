@@ -239,6 +239,21 @@
     --rdp-animation_timing: cubic-bezier(.4, 0, .2, 1);
 }
 
+/* Mobile only: screens smaller than 768px */
+@media (max-width: 767px) {
+  .mobile-footer-spacing {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 150px) !important;
+  }
+}
+
+/* Desktop: screens 768px and wider */
+@media (min-width: 768px) {
+  .mobile-footer-spacing {
+    padding-bottom: 20px;
+  }
+}
+
+
 .rdp-months {
     gap: var(--rdp-months-gap);
     flex-wrap: wrap;

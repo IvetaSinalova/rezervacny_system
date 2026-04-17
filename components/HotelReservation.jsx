@@ -419,17 +419,18 @@ export default function HotelReservation({ serviceName, autofill = false }) {
       {modalOpen && (
         <div
           style={{
-            position: "fixed",
+            position: "fixed", // Changed from absolute
             top: 0,
             left: 0,
-            width: "100vw",
-            height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.6)", // The shadow inside the iframe
+            width: "100%",
+            height: "100dvh", // Use dvh to account for Safari bars
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            WebkitOverflowScrolling: "touch",
             zIndex: 1000,
-            overflowY: "auto", // Enables scrolling for the modal
+            overflowY: "auto",
           }}
         >
           {" "}

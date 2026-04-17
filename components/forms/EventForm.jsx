@@ -4,6 +4,7 @@ import { ClientForm } from "./ClientForm";
 import { DogFormAllInfo } from "./DogFormAllInfo";
 import DiscountSection from "./../DiscountSection";
 import InvoiceToggle from "../InvoiceToggle";
+import "../../styles/EventCalendar.css";
 
 export default function EventForm({
   price,
@@ -88,7 +89,7 @@ export default function EventForm({
   };
 
   return (
-    <div>
+    <div className="mobile-footer-spacing">
       {/* Success overlay */}
       {success && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
