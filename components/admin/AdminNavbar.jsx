@@ -49,6 +49,10 @@ export default function AdminNavbar() {
           href: "/admin/long-term-reservations-overview",
         },
         {
+          label: "Zrušené rezervácie",
+          href: "/admin/canceled-reservations",
+        },
+        {
           label: "Tržby",
           href: "/admin/reservation-stats",
         },

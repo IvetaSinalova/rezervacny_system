@@ -39,9 +39,11 @@ export default function ReservationList({
                 <div className="text-sm text-gray-600">
                   {r.email} • {r.phone_number}
                 </div>
-                <div className="text-sm text-gray-600">
-                  Pes: <b>{r.dog_name}</b>
-                </div>
+                {r.dog_name && (
+                  <div className="text-sm text-gray-600">
+                    Pes: <b>{r.dog_name}</b>
+                  </div>
+                )}
               </div>
 
               <div className="text-sm text-right">
@@ -53,10 +55,12 @@ export default function ReservationList({
                       )}`
                     : formatDateSK(r.start_date)}
                 </div>
-                <div>
-                  <b>Vytvorené: </b>
-                  {formatDateSK(r.created_at)}
-                </div>
+                {r.created_a && (
+                  <div>
+                    <b>Vytvorené: </b>
+                    {formatDateSK(r.created_at)}
+                  </div>
+                )}
               </div>
             </div>
           </li>

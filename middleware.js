@@ -28,6 +28,7 @@ export const config = {
   matcher: [
     "/admin/3day-camp-reservation/:path*",
     "/admin/accomodation/:path*",
+    "/admin/canceled-reservations/:path*",
     "/admin/create-daily-hotel-reservation/:path*",
     "/admin/create-event-reservation/:path*",
     "/admin/create-hotel-reservation/:path*",

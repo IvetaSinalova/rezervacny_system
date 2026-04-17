@@ -9,8 +9,6 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitiaLoad] = useState(true);
 
-  console.log(reservation);
-
   const formatDateSK = (dateStr) => {
     const date = new Date(dateStr);
     if (!date) return "";
