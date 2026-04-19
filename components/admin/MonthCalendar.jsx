@@ -8,16 +8,14 @@ import "react-day-picker/dist/style.css";
 export default function MonthCalendar({
   activityDaysProps,
   setNewInitialDate,
+  initialDate,
 }) {
   const [activityDays, setActivityDays] = useState([]);
-  const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedDay, setSelectedDay] = useState(initialDate ?? null);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const updateScreen = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
+    const updateScreen = () => setIsMobile(window.innerWidth < 768);
     updateScreen();
     window.addEventListener("resize", updateScreen);
     return () => window.removeEventListener("resize", updateScreen);
@@ -28,7 +26,6 @@ export default function MonthCalendar({
     activityDaysProps.map((activeDay) => {
       const current = new Date(activeDay.start);
       const end = new Date(activeDay.end);
-
       while (current <= end) {
         dates.push(new Date(current));
         current.setDate(current.getDate() + 1);
@@ -37,17 +34,14 @@ export default function MonthCalendar({
     setActivityDays(dates);
   }, [activityDaysProps]);
 
+  // Keep the selection in sync if the parent changes initialDate later
+  // (e.g. URL ?date= changes after mount).
+  useEffect(() => {
+    if (initialDate) setSelectedDay(initialDate);
+  }, [initialDate]);
+
   function setFirstWeekDay(date) {
     const clicked = new Date(date);
-
-    // // Make Monday = 0, Sunday = 6
-    // const dayOfWeek = (clicked.getDay() + 6) % 7;
-
-    // // Calculate Monday of the same week
-    // const weekStart = new Date(clicked);
-    // weekStart.setDate(clicked.getDate() - dayOfWeek);
-    // 2. Check screen width
-
     setNewInitialDate(clicked);
   }
 
@@ -55,14 +49,12 @@ export default function MonthCalendar({
     <DayPicker
       locale={sk}
       numberOfMonths={isMobile ? 1 : 2}
+      defaultMonth={initialDate ?? undefined}
       onDayClick={(day) => {
         setSelectedDay(day);
-
         if (isMobile) {
-          // 📱 Mobile → use selected day
           setNewInitialDate(day);
         } else {
-          // 🖥 Desktop → use Monday of that week
           setFirstWeekDay(day);
         }
       }}
@@ -75,11 +67,11 @@ export default function MonthCalendar({
         today: {
           backgroundColor: "var(--color-secondary)",
           color: "#fff",
-          borderRadius: "50%", // full circle
+          borderRadius: "50%",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          lineHeight: "2.2em", // center the text
+          lineHeight: "2.2em",
         },
         hasActivity: {
           backgroundColor: "#e0dbd5",
@@ -90,9 +82,9 @@ export default function MonthCalendar({
           backgroundColor: "#6C8065",
           border: "none",
           color: "#fff",
-          borderRadius: "50%", // full circle
+          borderRadius: "50%",
           alignItems: "center",
-          lineHeight: "2.2em", // center the text
+          lineHeight: "2.2em",
         },
       }}
     />

@@ -67,6 +67,7 @@ export default function OverviewPage() {
         <MonthCalendar
           activityDaysProps={events}
           setNewInitialDate={setNewInitialDate}
+          initialDate={initialDate}
         />
       </div>
       <HandleEventCalendar
