@@ -59,8 +59,6 @@ const DiscountManager = () => {
         eventType === "long" ? formData.id_long_term_event : "",
     };
 
-    console.log(payload);
-
     try {
       const response = await fetch(API_BASE, {
         method: "POST",

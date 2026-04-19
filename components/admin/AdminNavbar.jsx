@@ -35,7 +35,7 @@ export default function AdminNavbar() {
       submenu: [
         { label: "Typ ubytovania", href: "/admin/accomodation" },
         {
-          label: "Spravovať ubytovanie",
+          label: "Spravovať dlhodobé kurzy a hotel",
           href: "/admin/update-long-term-events",
         },
       ],

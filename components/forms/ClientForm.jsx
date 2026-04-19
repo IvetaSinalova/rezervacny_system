@@ -1,7 +1,7 @@
 "use client";
 import { useState, forwardRef, useImperativeHandle } from "react";
 
-export const ClientForm = forwardRef(({ autofill }, ref) => {
+export const ClientForm = forwardRef(({ autofill, onAutofilled }, ref) => {
   const [isLoading, setIsLoading] = useState(false);
   const [client, setClient] = useState({
     firstName: "",
@@ -119,8 +119,24 @@ export const ClientForm = forwardRef(({ autofill }, ref) => {
         city: data.city,
         country: data.country,
       });
-      setIsLoading(false);
+      if (onAutofilled) {
+        const dog = data.first_dog
+          ? {
+              name: data.first_dog.name ?? "",
+              breed: data.first_dog.breed ?? "",
+              // <input type="date"> needs 'YYYY-MM-DD'.
+              dateOfBirth: data.first_dog.birth
+                ? String(data.first_dog.birth).slice(0, 10)
+                : "",
+              gender: data.first_dog.gender ?? "",
+            }
+          : null;
+
+        onAutofilled({ client: data, dog });
+      }
     } catch (err) {
+      setIsLoading(false);
+    } finally {
       setIsLoading(false);
     }
   };

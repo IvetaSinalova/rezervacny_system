@@ -1,7 +1,7 @@
 "use client";
 import { useState, useImperativeHandle, forwardRef } from "react";
 
-export const DogFormAllInfo = forwardRef(({}, ref) => {
+export const DogFormAllInfo = forwardRef(({ autofill }, ref) => {
   const [formData, setFormData] = useState({
     name: "",
     breed: "",
@@ -41,6 +41,17 @@ export const DogFormAllInfo = forwardRef(({}, ref) => {
   useImperativeHandle(ref, () => ({
     isValid: validate,
     getData: () => formData,
+    setData: (data) => {
+      if (!autofill) return;
+
+      setFormData({
+        name: data?.name ?? "",
+        breed: data?.breed ?? "",
+        dateOfBirth: data?.dateOfBirth ?? "",
+        gender: data?.gender ?? "",
+      });
+      setErrors({});
+    },
   }));
 
   const fieldKeys = ["name", "breed", "dateOfBirth", "gender"];

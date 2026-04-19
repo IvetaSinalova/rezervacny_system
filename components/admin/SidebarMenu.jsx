@@ -19,7 +19,7 @@ export default function SidebarMenu() {
       submenu: [
         { label: "Typ ubytovania", href: "/admin/accomodation" },
         {
-          label: "Spravovať ubytovanie alebo kurz",
+          label: "Spravovať dlhodobé kurzy a hotel",
           href: "/admin/update-long-term-events",
         },
       ],

@@ -97,7 +97,7 @@ export default function EventForm({
             <p className={`font-semibold text-xl ${messageColor}`}>{message}</p>
             {/* Close button that calls onClose */}
             <button
-              onClick={onClose}
+              onClick={() => window.location.reload()}
               className="mt-4 px-6 py-2 bg-[var(--color-tertiary)] text-white rounded-2xl hover:opacity-90 transition"
             >
               Zavrieť
@@ -109,8 +109,14 @@ export default function EventForm({
       {/* Form */}
       {!success && (
         <div className="flex flex-col gap-4">
-          <ClientForm ref={clientRef} autofill={autofill} />
-          <DogFormAllInfo ref={dogRef} />
+          <ClientForm
+            ref={clientRef}
+            autofill={autofill}
+            onAutofilled={({ dog }) => {
+              if (dog) dogRef.current?.setData(dog);
+            }}
+          />
+          <DogFormAllInfo ref={dogRef} autofill={autofill} />
 
           <div className="flex flex-col gap-1 shadow-xl bg-white p-6 rounded-2xl">
             <label className="font-semibold text-md">

@@ -228,7 +228,7 @@ function HallReservation({ autofill = false }) {
                 </p>
 
                 <button
-                  onClick={hideModal}
+                  onClick={() => window.location.reload()}
                   className="mt-4 px-6 py-2 bg-[var(--color-tertiary)] text-white rounded-2xl hover:opacity-90 transition"
                 >
                   Zavrieť

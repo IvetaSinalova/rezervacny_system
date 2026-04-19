@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Loading from "../Loading";
+import MaxCapacityForm from "./MaxCapacityForm";
 
 export default function LongTermEventTable() {
   const [events, setEvents] = useState([]);
@@ -61,7 +62,6 @@ export default function LongTermEventTable() {
       } else alert("Chyba pri ukladaní zmien!");
     } catch (err) {
       setLoading(false);
-
       console.error(err);
       alert("Chyba pri ukladaní zmien!");
     }
@@ -114,7 +114,7 @@ export default function LongTermEventTable() {
   return (
     <div className="p-4">
       <h2 className="text-center font-bold text-lg mb-4 text-primary">
-        Spravovať dlhodobé kurzy a ubytovanie
+        Spravovať dlhodobé kurzy a hotel
       </h2>
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
@@ -261,6 +261,7 @@ export default function LongTermEventTable() {
       >
         Uložiť zmeny
       </button>
+      <MaxCapacityForm updateLoading={(value) => setLoading(value)} />
     </div>
   );
 }

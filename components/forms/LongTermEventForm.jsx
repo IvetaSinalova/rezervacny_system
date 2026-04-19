@@ -205,7 +205,7 @@ function LongTermEventForm({
             <p className={`font-semibold text-xl ${messageColor}`}>{message}</p>
             {/* Close button that calls onClose */}
             <button
-              onClick={() => setModal(false)}
+              onClick={() => window.location.reload()}
               className="mt-4 px-6 py-2 bg-[var(--color-tertiary)] text-white rounded-2xl hover:opacity-90 transition"
             >
               Zavrieť
@@ -244,8 +244,14 @@ function LongTermEventForm({
             />
 
             {/* Client & Dog Forms */}
-            <ClientForm ref={clientRef} autofill={autofill} />
-            <DogFormAllInfo ref={dogRef} />
+            <ClientForm
+              ref={clientRef}
+              autofill={autofill}
+              onAutofilled={({ dog }) => {
+                if (dog) dogRef.current?.setData(dog);
+              }}
+            />
+            <DogFormAllInfo ref={dogRef} autofill={autofill} />
             <CustomDropdown
               label="Vyberte druh ubytovania"
               options={getAvailableAccomodations(accommodations)}

@@ -246,6 +246,7 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
                       reservation.reservation_id)
                     : (reservation.event_reservation_id ??
                       reservation.reservation_id);
+
                 const response = await fetch(
                   "https://www.psiaskola.sk/wp-json/events/v1/delete-reservation",
                   {
