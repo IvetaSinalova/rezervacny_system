@@ -5,9 +5,25 @@ import { toast } from "react-hot-toast";
 import "../../styles/EventCalendar.css";
 import Loading from "../Loading";
 function ReservationDetail({ reservationProps, onPaymentChange }) {
+  console.log(reservationProps);
   const [reservation, setReservation] = useState(reservationProps);
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitiaLoad] = useState(true);
+
+  useEffect(() => {
+    const value =
+      reservationProps.long_term_special_requirements ||
+      reservationProps.event_special_requirements;
+
+    if (value) {
+      setReservation((prev) => ({
+        ...prev,
+        special_requirements: value,
+      }));
+      console.log(value);
+      console.log(reservation.special_requirements);
+    }
+  }, [reservationProps]);
 
   const formatDateSK = (dateStr) => {
     const date = new Date(dateStr);
