@@ -55,7 +55,7 @@ export default function ReservationList({
                       )}`
                     : formatDateSK(r.start_date)}
                 </div>
-                {r.created_a && (
+                {r.created_at && (
                   <div>
                     <b>Vytvorené: </b>
                     {formatDateSK(r.created_at)}

@@ -30,7 +30,7 @@ function HotelReservationForm({
   const clientRef = useRef();
   const [discountInfo, setDiscountInfo] = useState(null);
   const dogRef = useRef();
-  const [needsInvoice, setNeedsInvoice] = useState(false);
+  const [needsInvoice, setNeedsInvoice] = useState(true);
   const getDayOfWeek = (date) => {
     // if date is a string, convert to Date
     const d = typeof date === "string" ? new Date(date) : date;
