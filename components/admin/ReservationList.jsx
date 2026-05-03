@@ -47,14 +47,16 @@ export default function ReservationList({
               </div>
 
               <div className="text-sm text-right">
-                <div>
-                  <b>{dateLabel}:</b>{" "}
-                  {range
-                    ? `${formatDateSK(r.start_date)} – ${formatDateSK(
-                        r.end_date,
-                      )}`
-                    : formatDateSK(r.start_date)}
-                </div>
+                {r.start_date && (
+                  <div>
+                    <b>{dateLabel}:</b>{" "}
+                    {range
+                      ? `${formatDateSK(r.start_date)} – ${formatDateSK(
+                          r.end_date,
+                        )}`
+                      : formatDateSK(r.start_date)}
+                  </div>
+                )}
                 {r.created_at && (
                   <div>
                     <b>Vytvorené: </b>

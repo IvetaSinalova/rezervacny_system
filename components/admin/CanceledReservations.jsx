@@ -14,6 +14,16 @@ export default function CanceledReservationsOverview({
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
+  const formatDateSK = (date) => {
+    if (!date) return "";
+
+    return new Intl.DateTimeFormat("sk-SK", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }).format(new Date(date));
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -177,7 +187,7 @@ export default function CanceledReservationsOverview({
                       Vytvorené:
                     </span>
                     <span className="text-gray-500 font-mono">
-                      {selectedItem.created_at}
+                      {formatDateSK(selectedItem.created_at)}
                     </span>
                   </div>
                 )}
