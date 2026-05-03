@@ -171,14 +171,16 @@ export default function CanceledReservationsOverview({
                     {selectedItem.service_start} — {selectedItem.service_end}
                   </span>
                 </div>
-                <div className="flex justify-between text-sm border-t border-gray-200 pt-3">
-                  <span className="text-gray-400 font-bold uppercase text-[10px]">
-                    ID záznamu
-                  </span>
-                  <span className="text-gray-500 font-mono">
-                    #{selectedItem.id}
-                  </span>
-                </div>
+                {selectedItem.created_at && (
+                  <div className="flex justify-between text-sm border-t border-gray-200 pt-3">
+                    <span className="text-gray-400 font-bold uppercase text-[10px]">
+                      Vytvorené:
+                    </span>
+                    <span className="text-gray-500 font-mono">
+                      {selectedItem.created_at}
+                    </span>
+                  </div>
+                )}
               </div>
 
               <button
