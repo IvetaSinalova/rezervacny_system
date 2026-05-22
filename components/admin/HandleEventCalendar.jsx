@@ -142,7 +142,7 @@ export default function EventCalendar({
             reservationToDelete.reservation_id)
           : reservationToDelete.event_reservation_id;
       const response = await fetch(
-        "https://www.psiaskola.sk/wp-json/events/v1/delete-user-from-event",
+        "/api/wp/events/v1/delete-user-from-event",
         {
           method: "POST",
           headers: {
@@ -196,7 +196,7 @@ export default function EventCalendar({
   //   setConfirmVisible(false);
   //   try {
   //     const response = await (
-  //       "https://www.psiaskola.sk/wp-json/events/v1/cancel-events-of-same-type-and-user",
+  //       "/api/wp/events/v1/cancel-events-of-same-type-and-user",
   //       {
   //         method: "POST",
   //         headers: {
@@ -238,7 +238,7 @@ export default function EventCalendar({
 
   const createReturnEvent = async () => {
     const response = await fetch(
-      "https://psiaskola.sk/wp-json/events/v1/plan-dog-return",
+      "/api/wp/events/v1/plan-dog-return",
       {
         method: "POST",
         headers: {
@@ -277,8 +277,8 @@ export default function EventCalendar({
     }
 
     const endpoint = formData.id
-      ? "https://www.psiaskola.sk//wp-json/events/v1/update-calendar-event"
-      : "https://www.psiaskola.sk//wp-json/events/v1/add-calendar-event";
+      ? "/api/wp/events/v1/update-calendar-event"
+      : "/api/wp/events/v1/add-calendar-event";
 
     try {
       const res = await fetch(endpoint, {
@@ -343,7 +343,7 @@ export default function EventCalendar({
     setSubmitBtnClicked(true);
     try {
       const res = await fetch(
-        "https://www.psiaskola.sk//wp-json/events/v1/delete-calendar-event",
+        "/api/wp/events/v1/delete-calendar-event",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -804,6 +804,30 @@ export default function EventCalendar({
               selectedType.id != 26 &&
               selectedEvent && (
                 <ReservationDetail
+                  onReservationUpdate={(updatedReservation) => {
+                    setEvents((prevEvents) =>
+                      prevEvents.map((event) => {
+                        if (event.id !== selectedEvent.id) return event;
+
+                        return {
+                          ...event,
+                          reservations: event.reservations?.map((res) => {
+                            const isTarget =
+                              (updatedReservation.long_term_reservation_id &&
+                                res.long_term_reservation_id ===
+                                  updatedReservation.long_term_reservation_id) ||
+                              (updatedReservation.event_reservation_id &&
+                                res.event_reservation_id ===
+                                  updatedReservation.event_reservation_id);
+
+                            return isTarget
+                              ? { ...res, ...updatedReservation }
+                              : res;
+                          }),
+                        };
+                      }),
+                    );
+                  }}
                   onPaymentChange={(attr, value, reservation_id) => {
                     setEvents((prevEvents) =>
                       prevEvents.map((event) => {

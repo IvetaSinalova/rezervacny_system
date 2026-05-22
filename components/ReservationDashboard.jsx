@@ -39,7 +39,7 @@ const ReservationDashboard = () => {
   };
 
   useEffect(() => {
-    fetch("https://psiaskola.sk/wp-json/reservations/v1/stats")
+    fetch("/api/wp/reservations/v1/stats")
       .then((res) => res.json())
       .then((json) => {
         setData(json);

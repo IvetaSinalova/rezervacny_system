@@ -28,7 +28,7 @@ export default function CanceledReservationsOverview({
     const fetchData = async () => {
       try {
         const response = await fetch(
-          "https://www.psiaskola.sk/wp-json/moje-auto/v1/canceled-reservations",
+          "/api/wp/moje-auto/v1/canceled-reservations",
         );
         const data = await response.json();
 

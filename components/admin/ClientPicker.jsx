@@ -13,7 +13,7 @@ function ClientPicker({
   useEffect(() => {
     updateLoadingReturnDog(true);
 
-    fetch("https://psiaskola.sk/wp-json/events/v1/get-user-to-plan-dog-return")
+    fetch("/api/wp/events/v1/get-user-to-plan-dog-return")
       .then((res) => res.json())
       .then((data) => {
         const mapped = data.map((r) => ({

@@ -14,7 +14,7 @@ export default function LongTermEventTable() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("https://psiaskola.sk/wp-json/events/v1/long-term-events")
+    fetch("/api/wp/events/v1/long-term-events")
       .then((res) => res.json())
       .then((data) => {
         setEvents(data);
@@ -47,7 +47,7 @@ export default function LongTermEventTable() {
     if (updates.length === 0) return;
     try {
       const res = await fetch(
-        "https://psiaskola.sk/wp-json/events/v1/update-long-term-events",
+        "/api/wp/events/v1/update-long-term-events",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -70,7 +70,7 @@ export default function LongTermEventTable() {
   const handleCreate = async () => {
     try {
       const res = await fetch(
-        "https://psiaskola.sk/wp-json/events/v1/create-long-term-event",
+        "/api/wp/events/v1/create-long-term-event",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -91,7 +91,7 @@ export default function LongTermEventTable() {
     if (!confirm("Naozaj chcete vymazať túto položku?")) return;
     try {
       await fetch(
-        "https://psiaskola.sk/wp-json/events/v1/delete-long-term-event",
+        "/api/wp/events/v1/delete-long-term-event",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

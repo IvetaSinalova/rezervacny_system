@@ -19,10 +19,10 @@ export default function page() {
   useEffect(() => {
     setLoading(true);
     Promise.all([
-      fetch("https://psiaskola.sk/wp-json/events/v1/all-types-events").then(
+      fetch("/api/wp/events/v1/all-types-events").then(
         (res) => res.json(),
       ),
-      fetch("https://psiaskola.sk/wp-json/events/v1/all-calendar-events").then(
+      fetch("/api/wp/events/v1/all-calendar-events").then(
         (res) => res.json(),
       ),
     ])

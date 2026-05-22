@@ -4,11 +4,28 @@ import React, { useState, useEffect, use } from "react";
 import { toast } from "react-hot-toast";
 import "../../styles/EventCalendar.css";
 import Loading from "../Loading";
-function ReservationDetail({ reservationProps, onPaymentChange }) {
+
+const SWITCHABLE_LONG_TERM_SERVICE_TYPES = {
+  prevychova: { id: "1", label: "Prevýchova psa" },
+  vycvik: { id: "2", label: "Výcvik s ubytovaním" },
+};
+
+function ReservationDetail({
+  reservationProps,
+  onPaymentChange,
+  onReservationUpdate,
+}) {
   console.log(reservationProps);
   const [reservation, setReservation] = useState(reservationProps);
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitiaLoad] = useState(true);
+  const [switchingServiceType, setSwitchingServiceType] = useState(false);
+  const [switchingAccommodation, setSwitchingAccommodation] = useState(false);
+  const [accommodations, setAccommodations] = useState([]);
+  const [priceDraft, setPriceDraft] = useState(
+    reservationProps?.event_total_price ?? reservationProps?.final_price ?? "",
+  );
+  const [savingPrice, setSavingPrice] = useState(false);
 
   useEffect(() => {
     const value =
@@ -44,9 +61,207 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
 
   const [isSaving, setIsSaving] = useState(false);
 
+  const reservationId =
+    reservation?.reservation_type === "long_term"
+      ? (reservation.long_term_reservation_id ?? reservation.reservation_id)
+      : reservation?.reservation_id;
+  const currentLongTermServiceId = String(
+    reservation?.long_term_event_type_id ?? "",
+  );
+  const canSwitchServiceType =
+    reservation?.reservation_type === "long_term" &&
+    ["1", "2"].includes(currentLongTermServiceId);
+  const currentAccommodationId = String(
+    reservation?.accommodation_id ??
+      accommodations.find(
+        (item) => item.name === reservation?.accommodation_name,
+      )?.id ??
+      "",
+  );
+  const visibleAccommodations = accommodations.filter(
+    (item) => String(item.id) !== "6" && item.name !== "Homeless",
+  );
+  const canSwitchAccommodation =
+    reservation?.reservation_type === "long_term" &&
+    Boolean(currentAccommodationId) &&
+    visibleAccommodations.length > 0 &&
+    visibleAccommodations.some(
+      (item) => String(item.id) === currentAccommodationId,
+    );
+  const currentSwitchValue =
+    currentLongTermServiceId ===
+    SWITCHABLE_LONG_TERM_SERVICE_TYPES.prevychova.id
+      ? "prevychova"
+      : "vycvik";
+
+  useEffect(() => {
+    if (reservationProps?.reservation_type !== "long_term") return;
+
+    fetch("/api/wp/events/v1/all-accomodations")
+      .then((response) => response.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setAccommodations(data);
+        }
+      })
+      .catch((err) => console.error(err));
+  }, [reservationProps?.reservation_type]);
+
+  const handleServiceTypeSwitch = async (newServiceType) => {
+    if (!canSwitchServiceType || newServiceType === currentSwitchValue) return;
+
+    const targetLabel =
+      SWITCHABLE_LONG_TERM_SERVICE_TYPES[newServiceType]?.label || "";
+
+    if (
+      !confirm(
+        `Naozaj chcete zmeniť službu na ${targetLabel}? Cena bude prepočítaná.`,
+      )
+    ) {
+      return;
+    }
+
+    setSwitchingServiceType(true);
+    setLoading(true);
+
+    try {
+      const response = await fetch(
+        `/api/wp/events/v1/reservations/${reservationId}/switch-service-type`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ newServiceType }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        alert(data.message || "Nepodarilo sa zmeniť typ služby.");
+        return;
+      }
+
+      setReservation((prev) => ({ ...prev, ...data.reservation }));
+      setPriceDraft(data.reservation.event_total_price ?? "");
+      onReservationUpdate?.(data.reservation);
+    } catch (err) {
+      console.error(err);
+      alert("Chyba spojenia so serverom.");
+    } finally {
+      setSwitchingServiceType(false);
+      setLoading(false);
+    }
+  };
+
+  const handleAccommodationSwitch = async (newAccommodationId) => {
+    if (
+      !canSwitchAccommodation ||
+      String(newAccommodationId) === currentAccommodationId
+    ) {
+      return;
+    }
+
+    const targetAccommodation = accommodations.find(
+      (item) => String(item.id) === String(newAccommodationId),
+    );
+    const targetLabel = targetAccommodation?.name || "";
+
+    if (
+      !confirm(
+        `Naozaj chcete zmeniť ubytovanie na ${targetLabel}? Cena bude prepočítaná.`,
+      )
+    ) {
+      return;
+    }
+
+    setSwitchingAccommodation(true);
+    setLoading(true);
+
+    try {
+      const response = await fetch(
+        `/api/wp/events/v1/reservations/${reservationId}/accommodation`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ accommodationId: Number(newAccommodationId) }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        alert(data.message || "Nepodarilo sa zmeniť typ ubytovania.");
+        return;
+      }
+
+      setReservation((prev) => ({ ...prev, ...data.reservation }));
+      setPriceDraft(data.reservation.event_total_price ?? "");
+      onReservationUpdate?.(data.reservation);
+    } catch (err) {
+      console.error(err);
+      alert("Chyba spojenia so serverom.");
+    } finally {
+      setSwitchingAccommodation(false);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     setReservation(reservationProps);
+    setPriceDraft(
+      reservationProps?.event_total_price ??
+        reservationProps?.final_price ??
+        "",
+    );
   }, [reservationProps]);
+
+  const handlePriceSave = async () => {
+    const parsedPrice = Number(String(priceDraft).replace(",", "."));
+
+    if (!Number.isFinite(parsedPrice) || parsedPrice < 0) {
+      alert("Zadajte platnú cenu.");
+      return;
+    }
+
+    const currentPrice = Number(
+      reservation?.event_total_price ?? reservation?.final_price ?? 0,
+    );
+    if (parsedPrice === currentPrice) return;
+
+    setSavingPrice(true);
+    setLoading(true);
+
+    try {
+      const response = await fetch(
+        `/api/wp/events/v1/reservations/${reservationId}/price`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            reservation_type: reservation.reservation_type,
+            price: parsedPrice,
+          }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        alert(data.message || "Nepodarilo sa uložiť cenu.");
+        return;
+      }
+
+      setReservation((prev) => ({ ...prev, ...data.reservation }));
+      setPriceDraft(data.reservation.event_total_price ?? parsedPrice);
+      onReservationUpdate?.(data.reservation);
+    } catch (err) {
+      console.error(err);
+      alert("Chyba spojenia so serverom.");
+    } finally {
+      setSavingPrice(false);
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (
@@ -62,23 +277,20 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
   const handleSaveOwner = async () => {
     setIsSaving(true);
 
-    const response = await fetch(
-      "https://www.psiaskola.sk/wp-json/events/v1/update-client",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          first_name: reservation.first_name,
-          last_name: reservation.last_name,
-          phone_number: reservation.phone_number,
-          email: reservation.email,
-          street: reservation.street,
-          zip: reservation.zip,
-          city: reservation.city,
-          client_id: reservation.client_id,
-        }),
-      },
-    );
+    const response = await fetch("/api/wp/events/v1/update-client", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        first_name: reservation.first_name,
+        last_name: reservation.last_name,
+        phone_number: reservation.phone_number,
+        email: reservation.email,
+        street: reservation.street,
+        zip: reservation.zip,
+        city: reservation.city,
+        client_id: reservation.client_id,
+      }),
+    });
     const data = await response.json();
 
     setIsSaving(false);
@@ -114,20 +326,17 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
   const handleSaveDog = async () => {
     setIsSaving(true);
 
-    const response = await fetch(
-      "https://www.psiaskola.sk/wp-json/events/v1/update-dog",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: reservation.dog_name,
-          breed: reservation.breed,
-          birth: reservation.birth,
-          gender: reservation.gender,
-          dog_id: reservation.dog_id,
-        }),
-      },
-    );
+    const response = await fetch("/api/wp/events/v1/update-dog", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: reservation.dog_name,
+        breed: reservation.breed,
+        birth: reservation.birth,
+        gender: reservation.gender,
+        dog_id: reservation.dog_id,
+      }),
+    });
     const data = await response.json();
 
     setIsSaving(false);
@@ -165,19 +374,16 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
         reservation.reservation_type === "long_term"
           ? (reservation.long_term_reservation_id ?? reservation.reservation_id)
           : reservation.reservation_id;
-      const response = await fetch(
-        "https://www.psiaskola.sk/wp-json/events/v1/update-payment",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            reservation_id: reservation_id,
-            reservation_type: reservation.reservation_type,
-            field: attr, // "is_paid" or "is_deposit_paid"
-            value: value,
-          }),
-        },
-      );
+      const response = await fetch("/api/wp/events/v1/update-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          reservation_id: reservation_id,
+          reservation_type: reservation.reservation_type,
+          field: attr, // "is_paid" or "is_deposit_paid"
+          value: value,
+        }),
+      });
 
       const data = await response.json();
 
@@ -232,22 +438,21 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
             {reservation.extra_days > 1 ? "dní" : "deň"}
           </div>
         )}
-        {reservation?.event_total_price &&
-          reservation?.long_term_event_type_id !== "6" && (
-            <div className="text-center font-bold text-lg mt-2 mb-3">
-              <div>{reservation.event_total_price}€</div>
-              {reservation.sf_id && (
-                <a
-                  href={`https://moja.superfaktura.sk/invoices/pdf/${reservation.sf_id}`}
-                  target="_blank"
-                  className="underline font-normal"
-                >
-                  {" "}
-                  Stiahnuť faktúru{" "}
-                </a>
-              )}
-            </div>
+
+        {/* <div className="text-center font-bold text-lg mt-2 mb-3">
+          {/* <div>{reservation.event_total_price}€</div> }
+          {reservation.sf_id && (
+            <a
+              href={`https://moja.superfaktura.sk/invoices/pdf/${reservation.sf_id}`}
+              target="_blank"
+              className="underline font-normal"
+            >
+              {" "}
+              Stiahnuť faktúru{" "}
+            </a>
           )}
+        </div> */}
+
         <div className="text-center mt-3">
           <button
             disabled={loading}
@@ -264,7 +469,7 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
                       reservation.reservation_id);
 
                 const response = await fetch(
-                  "https://www.psiaskola.sk/wp-json/events/v1/delete-reservation",
+                  "/api/wp/events/v1/delete-reservation",
                   {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -299,6 +504,88 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
             Zrušiť rezerváciu
           </button>
         </div>
+        {["long_term", "event"].includes(reservation?.reservation_type) &&
+          reservation?.long_term_event_type_id !== "6" && (
+            <div className="bg-gray-50 p-6 rounded-xl shadow-inner mt-4">
+              <label className="text-sm font-medium text-gray-600 ml-1 mb-1 block">
+                Cena rezervácie
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={priceDraft}
+                  disabled={savingPrice || loading}
+                  onChange={(e) => setPriceDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handlePriceSave();
+                    }
+                  }}
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none transition-all bg-white"
+                />
+                <button
+                  type="button"
+                  disabled={savingPrice || loading}
+                  onClick={handlePriceSave}
+                  className="btn-save px-4 py-2 bg-[var(--color-tertiary)] text-white rounded-lg disabled:opacity-50"
+                >
+                  {savingPrice ? "Ukladám..." : "Uložiť"}
+                </button>
+              </div>
+            </div>
+          )}
+        {canSwitchServiceType && (
+          <div className="bg-gray-50 p-6 rounded-xl shadow-inner mt-4">
+            <label className="text-sm font-medium text-gray-600 ml-1 mb-1 block">
+              Typ služby
+            </label>
+            <select
+              value={currentSwitchValue}
+              disabled={switchingServiceType || loading}
+              onChange={(e) => handleServiceTypeSwitch(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none transition-all bg-white"
+            >
+              <option value="prevychova">
+                {SWITCHABLE_LONG_TERM_SERVICE_TYPES.prevychova.label}
+              </option>
+              <option value="vycvik">
+                {SWITCHABLE_LONG_TERM_SERVICE_TYPES.vycvik.label}
+              </option>
+            </select>
+            {switchingServiceType && (
+              <div className="text-sm text-gray-500 mt-2">
+                Prepočítavam cenu...
+              </div>
+            )}
+          </div>
+        )}
+        {canSwitchAccommodation && (
+          <div className="bg-gray-50 p-6 rounded-xl shadow-inner mt-4">
+            <label className="text-sm font-medium text-gray-600 ml-1 mb-1 block">
+              Typ ubytovania
+            </label>
+            <select
+              value={currentAccommodationId}
+              disabled={switchingAccommodation || loading}
+              onChange={(e) => handleAccommodationSwitch(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none transition-all bg-white"
+            >
+              {visibleAccommodations.map((item) => (
+                <option key={item.id} value={String(item.id)}>
+                  {item.name}
+                </option>
+              ))}
+            </select>
+            {switchingAccommodation && (
+              <div className="text-sm text-gray-500 mt-2">
+                Prepočítavam cenu...
+              </div>
+            )}
+          </div>
+        )}
       </div>
       <div>
         <div className="bg-gray-50 p-6 rounded-xl shadow-inner">
@@ -596,7 +883,7 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
         </div>
       )}
       {/* Long-term / Accommodation Info */}
-      {reservation?.accommodation_name && (
+      {/* {reservation?.accommodation_name && (
         <div className="bg-gray-50 p-4 rounded-xl shadow-inner space-y-2">
           <h3 className="font-semibold text-md text-gray-700 mb-2">
             Ubytovanie
@@ -624,7 +911,7 @@ function ReservationDetail({ reservationProps, onPaymentChange }) {
             </div>
           )}
         </div>
-      )}
+      )} */}
 
       {reservation?.training_walks &&
         reservation?.long_term_event_type_id !== "6" && (

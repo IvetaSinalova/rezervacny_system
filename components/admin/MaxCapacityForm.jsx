@@ -8,7 +8,7 @@ export default function MaxCapacityForm({ updateLoading }) {
 
   // Fetch the current capacity on mount.
   useEffect(() => {
-    fetch("https://psiaskola.sk/wp-json/events/v1/get-max-capacity")
+    fetch("/api/wp/events/v1/get-max-capacity")
       .then((res) => res.json())
       .then((data) => {
         if (data && data.maxCapacity !== undefined) {
@@ -44,7 +44,7 @@ export default function MaxCapacityForm({ updateLoading }) {
 
     try {
       const res = await fetch(
-        "https://psiaskola.sk/wp-json/events/v1/set-max-capacity",
+        "/api/wp/events/v1/set-max-capacity",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

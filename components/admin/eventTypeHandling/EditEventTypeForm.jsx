@@ -10,7 +10,7 @@ export default function EditEventTypeForm({
   const [status, setStatus] = useState("");
 
   useEffect(() => {
-    fetch("https://psiaskola.sk/wp-json/events/v1/all-types-events-admin")
+    fetch("/api/wp/events/v1/all-types-events-admin")
       .then((res) => res.json())
       .then((data) => {
         setEvents(data);
@@ -36,7 +36,7 @@ export default function EditEventTypeForm({
     updateLoading(true);
     try {
       const res = await fetch(
-        "https://psiaskola.sk/wp-json/events/v1/update-types-events",
+        "/api/wp/events/v1/update-types-events",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -219,7 +219,7 @@ export default function EditEventTypeForm({
 
                         try {
                           const res = await fetch(
-                            "https://psiaskola.sk/wp-json/events/v1/delete-event",
+                            "/api/wp/events/v1/delete-event",
                             {
                               method: "POST",
                               headers: { "Content-Type": "application/json" },

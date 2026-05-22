@@ -12,7 +12,7 @@ export default function ManageEventsPage() {
 
   useEffect(() => {
     Promise.all([
-      fetch("https://psiaskola.sk/wp-json/events/v1/all-accomodations").then(
+      fetch("/api/wp/events/v1/all-accomodations").then(
         (res) => res.json(),
       ),
     ])

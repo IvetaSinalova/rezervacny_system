@@ -36,10 +36,10 @@ export default function OverviewPage() {
     setLoading(true);
     Promise.all([
       fetch(
-        "https://psiaskola.sk/wp-json/events/v1/all-types-events-admin",
+        "/api/wp/events/v1/all-types-events-admin",
       ).then((res) => res.json()),
       fetch(
-        "https://psiaskola.sk/wp-json/events/v1/all-calendar-events-with-clients",
+        "/api/wp/events/v1/all-calendar-events-with-clients",
       ).then((res) => res.json()),
     ])
       .then(([types, eventsData]) => {

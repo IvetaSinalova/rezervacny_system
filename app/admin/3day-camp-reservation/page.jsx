@@ -18,10 +18,10 @@ export default function Home() {
 
   useEffect(() => {
     Promise.all([
-      fetch("https://psiaskola.sk/wp-json/events/v1/all-types-events").then(
+      fetch("/api/wp/events/v1/all-types-events").then(
         (res) => res.json(),
       ),
-      fetch("https://psiaskola.sk/wp-json/events/v1/3day-camp-events").then(
+      fetch("/api/wp/events/v1/3day-camp-events").then(
         (res) => res.json(),
       ),
     ])

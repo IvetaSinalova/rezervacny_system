@@ -36,7 +36,7 @@ export default function AccommodationsAdmin({ accommodationsProps, loading }) {
     e.preventDefault();
     try {
       const res = await fetch(
-        "https://psiaskola.sk/wp-json/events/v1/create-accomodation",
+        "/api/wp/events/v1/create-accomodation",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -63,7 +63,7 @@ export default function AccommodationsAdmin({ accommodationsProps, loading }) {
     if (updates.length === 0) return; // nothing to update
     try {
       const res = await fetch(
-        "https://psiaskola.sk/wp-json/events/v1/update-accomodations",
+        "/api/wp/events/v1/update-accomodations",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -89,7 +89,7 @@ export default function AccommodationsAdmin({ accommodationsProps, loading }) {
     if (!confirm("Naozaj chcete vymazať túto položku?")) return;
     try {
       await fetch(
-        "https://psiaskola.sk/wp-json/events/v1/delete-accomodation",
+        "/api/wp/events/v1/delete-accomodation",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

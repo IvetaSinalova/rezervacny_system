@@ -24,7 +24,7 @@ const DiscountManager = () => {
     id_short_term_event: "",
   });
 
-  const API_BASE = "https://psiaskola.sk/wp-json/psia-skola/v1/discounts";
+  const API_BASE = "/api/wp/psia-skola/v1/discounts";
 
   useEffect(() => {
     fetchInitialData();

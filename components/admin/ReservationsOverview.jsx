@@ -119,6 +119,19 @@ export default function ReservationsOverview({
             <div className="flex-1 overflow-y-auto p-6">
               <ReservationDetail
                 reservationProps={selectedReservation}
+                onReservationUpdate={(updatedReservation) => {
+                  setSelectedReservation((prev) => ({
+                    ...prev,
+                    ...updatedReservation,
+                  }));
+                  setReservations((prev) =>
+                    prev.map((r) =>
+                      r.reservation_id === selectedReservation.reservation_id
+                        ? { ...r, ...updatedReservation }
+                        : r,
+                    ),
+                  );
+                }}
                 onPaymentChange={(attr, value, reservation_id) => {
                   // update parent state
                   setReservations((prev) =>

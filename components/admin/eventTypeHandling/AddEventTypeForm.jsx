@@ -44,7 +44,7 @@ export default function AddEventForm({
 
     try {
       const res = await fetch(
-        "https://psiaskola.sk/wp-json/events/v1/add-event-type",
+        "/api/wp/events/v1/add-event-type",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
