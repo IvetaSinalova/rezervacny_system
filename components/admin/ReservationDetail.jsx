@@ -53,6 +53,21 @@ function ReservationDetail({
     return `${day}.${month}. ${year}`;
   };
 
+  const formatDateTimeSK = (dateStr) => {
+    if (!dateStr) return "";
+
+    const date = new Date(dateStr);
+    if (Number.isNaN(date.getTime())) return "";
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
+    return `${day}.${month}. ${year} ${hours}:${minutes}`;
+  };
+
   // Add this inside your ReservationDetail component
   const handleFieldChange = (e) => {
     const { name, value } = e.target;
@@ -288,6 +303,7 @@ function ReservationDetail({
         street: reservation.street,
         zip: reservation.zip,
         city: reservation.city,
+        country: reservation.country,
         client_id: reservation.client_id,
       }),
     });
@@ -311,6 +327,7 @@ function ReservationDetail({
         street: reservation.street,
         zip: reservation.zip,
         city: reservation.city,
+        country: reservation.country,
       };
 
       // 2. Loop through the entries and trigger the function for each
@@ -407,29 +424,28 @@ function ReservationDetail({
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto rounded-2xl  space-y-6">
+    <div className="mx-auto w-full max-w-4xl space-y-4 rounded-2xl sm:space-y-6">
       <div>
-        <h3
-          style={{
-            textAlign: "center",
-            fontWeight: "bold",
-            fontSize: "20px",
-          }}
-        >
+        <h3 className="text-center text-xl font-bold sm:text-2xl">
           Detail rezervácie
         </h3>
         {reservation.event_name && (
-          <div className="text-center font-bold text-lg mt-3">
+          <div className="mt-3 break-words px-2 text-center text-lg font-bold sm:text-xl">
             {reservation.event_name}
           </div>
         )}
         {reservation.start_date && (
-          <div className="text-center font-bold text-md">
+          <div className="px-2 text-center text-sm font-semibold sm:text-base">
             {reservation.end_date
-              ? `${formatDateSK(reservation.start_date)} - ${formatDateSK(
+              ? `${formatDateTimeSK(reservation.start_date)} - ${formatDateTimeSK(
                   reservation.end_date,
                 )}`
-              : formatDateSK(reservation.start_date)}
+              : formatDateTimeSK(reservation.start_date)}
+          </div>
+        )}
+        {reservation.created_at && (
+          <div className="mt-2 px-2 text-center text-sm text-gray-600">
+            Vytvorené: {formatDateTimeSK(reservation.created_at)}
           </div>
         )}
         {reservation.extra_days && reservation.extra_days > 0 && (
@@ -453,7 +469,7 @@ function ReservationDetail({
           )}
         </div> */}
 
-        <div className="text-center mt-3">
+        <div className="mt-4 text-center">
           <button
             disabled={loading}
             onClick={async () => {
@@ -495,10 +511,10 @@ function ReservationDetail({
                 setLoading(false);
               }
             }}
-            className={`bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg  ${
+            className={`w-full rounded-lg bg-red-500 px-4 py-3 text-sm font-semibold text-white sm:w-auto ${
               isSaving || loading
                 ? "opacity-50 cursor-not-allowed bg-gray-400"
-                : "hover:opacity-90 bg-[var(--color-tertiary)]}"
+                : "hover:bg-red-600 hover:opacity-90"
             } `}
           >
             Zrušiť rezerváciu
@@ -506,11 +522,11 @@ function ReservationDetail({
         </div>
         {["long_term", "event"].includes(reservation?.reservation_type) &&
           reservation?.long_term_event_type_id !== "6" && (
-            <div className="bg-gray-50 p-6 rounded-xl shadow-inner mt-4">
+            <div className="mt-4 rounded-2xl bg-gray-50 p-4 shadow-inner sm:p-6">
               <label className="text-sm font-medium text-gray-600 ml-1 mb-1 block">
                 Cena rezervácie
               </label>
-              <div className="flex gap-2">
+              <div className="flex flex-col gap-2 sm:flex-row">
                 <input
                   type="number"
                   min="0"
@@ -530,7 +546,7 @@ function ReservationDetail({
                   type="button"
                   disabled={savingPrice || loading}
                   onClick={handlePriceSave}
-                  className="btn-save px-4 py-2 bg-[var(--color-tertiary)] text-white rounded-lg disabled:opacity-50"
+                  className="btn-save w-full rounded-lg bg-[var(--color-tertiary)] px-4 py-2 text-white disabled:opacity-50 sm:w-auto"
                 >
                   {savingPrice ? "Ukladám..." : "Uložiť"}
                 </button>
@@ -538,7 +554,7 @@ function ReservationDetail({
             </div>
           )}
         {canSwitchServiceType && (
-          <div className="bg-gray-50 p-6 rounded-xl shadow-inner mt-4">
+          <div className="mt-4 rounded-2xl bg-gray-50 p-4 shadow-inner sm:p-6">
             <label className="text-sm font-medium text-gray-600 ml-1 mb-1 block">
               Typ služby
             </label>
@@ -563,7 +579,7 @@ function ReservationDetail({
           </div>
         )}
         {canSwitchAccommodation && (
-          <div className="bg-gray-50 p-6 rounded-xl shadow-inner mt-4">
+          <div className="mt-4 rounded-2xl bg-gray-50 p-4 shadow-inner sm:p-6">
             <label className="text-sm font-medium text-gray-600 ml-1 mb-1 block">
               Typ ubytovania
             </label>
@@ -588,15 +604,15 @@ function ReservationDetail({
         )}
       </div>
       <div>
-        <div className="bg-gray-50 p-6 rounded-xl shadow-inner">
+        <div className="rounded-2xl bg-gray-50 p-4 shadow-inner sm:p-6">
           <h3 className="font-semibold text-lg text-gray-700 mb-2">Platba</h3>
           {/* Záloha uhradená */}
           {reservation?.is_deposit_paid &&
             reservation?.long_term_event_type_id !== "6" && (
-              <div className="flex items-center space-x-6">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
                 <span className="font-medium">Záloha uhradená:</span>
 
-                <label className="flex items-center space-x-2 cursor-pointer">
+                <label className="flex cursor-pointer items-center space-x-2">
                   <input
                     type="radio"
                     name={`is_deposit_paid_${reservation.dog_id}`}
@@ -609,7 +625,7 @@ function ReservationDetail({
                   <span>Áno</span>
                 </label>
 
-                <label className="flex items-center space-x-2 cursor-pointer">
+                <label className="flex cursor-pointer items-center space-x-2">
                   <input
                     type="radio"
                     name={`is_deposit_paid_${reservation.dog_id}`}
@@ -625,7 +641,7 @@ function ReservationDetail({
             )}
 
           {/* Zaplatené */}
-          <div className="flex items-center space-x-6">
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
             <span className="font-medium">
               {reservation.is_deposit_paid &&
               reservation?.long_term_event_type_id !== "6"
@@ -633,7 +649,7 @@ function ReservationDetail({
                 : "Zaplatené"}
             </span>
 
-            <label className="flex items-center space-x-2 cursor-pointer">
+            <label className="flex cursor-pointer items-center space-x-2">
               <input
                 type="radio"
                 name={`is_paid_${reservation.dog_id}`}
@@ -646,7 +662,7 @@ function ReservationDetail({
               <span>Áno</span>
             </label>
 
-            <label className="flex items-center space-x-2 cursor-pointer">
+            <label className="flex cursor-pointer items-center space-x-2">
               <input
                 type="radio"
                 name={`is_paid_${reservation.dog_id}`}
@@ -662,10 +678,10 @@ function ReservationDetail({
         </div>
       </div>
 
-      <div className="bg-gray-50 p-6 rounded-xl shadow-inner">
+      <div className="rounded-2xl bg-gray-50 p-4 shadow-inner sm:p-6">
         <h3 className="font-semibold text-lg text-gray-700 mb-2">Majiteľ</h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {/* First Name */}
           <div className="flex flex-col space-y-1">
             <label className="text-sm font-medium text-gray-600 ml-1">
@@ -770,13 +786,28 @@ function ReservationDetail({
               placeholder="Mesto"
             />
           </div>
+
+          {/* Country */}
+          <div className="flex flex-col space-y-1">
+            <label className="text-sm font-medium text-gray-600 ml-1">
+              Štát
+            </label>
+            <input
+              name="country"
+              disabled={isSaving}
+              value={reservation.country || ""}
+              onChange={handleFieldChange}
+              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none transition-all bg-white"
+              placeholder="Štát"
+            />
+          </div>
         </div>
-        <div className="flex justify-end w-full">
+        <div className="flex w-full justify-stretch sm:justify-end">
           <button
             type="submit"
             onClick={handleSaveOwner} // Make sure your save function is called here
             disabled={isSaving} // Disable if saving OR if payment is loading
-            className={`btn-save mt-4 px-6 py-2 text-white rounded-lg transition-all flex items-center gap-2 ${
+            className={`btn-save mt-4 flex w-full items-center justify-center gap-2 rounded-lg px-6 py-3 text-white transition-all sm:w-auto sm:py-2 ${
               isSaving || loading
                 ? "opacity-50 cursor-not-allowed bg-gray-400"
                 : "hover:opacity-90 bg-[var(--color-tertiary)]"
@@ -795,10 +826,10 @@ function ReservationDetail({
 
       {/* Dog */}
       {reservation?.dog_name && (
-        <div className="bg-gray-50 p-6 rounded-xl shadow-inner border border-gray-100">
+        <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4 shadow-inner sm:p-6">
           <h3 className="font-semibold text-lg text-gray-700 mb-2">Pes</h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {/* Dog Name */}
             <div className="flex flex-col space-y-1">
               <label className="text-sm font-medium text-gray-600 ml-1">
@@ -860,12 +891,12 @@ function ReservationDetail({
               />
             </div>
           </div>
-          <div className="flex justify-end w-full">
+          <div className="flex w-full justify-stretch sm:justify-end">
             <button
               type="submit"
               onClick={handleSaveDog} // Make sure your save function is called here
               disabled={isSaving} // Disable if saving OR if payment is loading
-              className={`btn-save mt-4 px-6 py-2 text-white rounded-lg transition-all flex items-center gap-2 ${
+              className={`btn-save mt-4 flex w-full items-center justify-center gap-2 rounded-lg px-6 py-3 text-white transition-all sm:w-auto sm:py-2 ${
                 isSaving || loading
                   ? "opacity-50 cursor-not-allowed bg-gray-400"
                   : "hover:opacity-90 bg-[var(--color-tertiary)]"

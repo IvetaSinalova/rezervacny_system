@@ -15,6 +15,21 @@ export default function ReservationList({
       year: "numeric",
     }).format(new Date(date));
   };
+
+  const canceledByLabel = (value) =>
+    value === "admin"
+      ? "Zrušené adminom"
+      : value === "client"
+        ? "Zrušené klientom"
+        : "";
+
+  const canceledByBadgeClass = (value) =>
+    value === "admin"
+      ? "border-amber-200 bg-amber-50 text-amber-800"
+      : value === "client"
+        ? "border-rose-200 bg-rose-50 text-rose-800"
+        : "border-slate-200 bg-slate-50 text-slate-600";
+
   return (
     <div className="bg-white shadow-xl rounded-2xl p-6">
       <h2 className="text-2xl font-bold mb-4">{title}</h2>
@@ -35,7 +50,16 @@ export default function ReservationList({
                 <div className="font-semibold text-lg">
                   {r.first_name} {r.last_name}
                 </div>
-                <div className="font-semibold text-sm">{r.event_name}</div>
+                <div className="mt-1 flex flex-wrap items-center gap-2">
+                  <div className="font-semibold text-sm">{r.event_name}</div>
+                  {canceledByLabel(r.canceled_by) && (
+                    <span
+                      className={`inline-flex rounded-full border px-2.5 py-0.5 text-xs font-semibold ${canceledByBadgeClass(r.canceled_by)}`}
+                    >
+                      {canceledByLabel(r.canceled_by)}
+                    </span>
+                  )}
+                </div>
                 <div className="text-sm text-gray-600">
                   {r.email} • {r.phone_number}
                 </div>

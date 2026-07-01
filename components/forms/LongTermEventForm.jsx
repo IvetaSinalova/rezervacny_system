@@ -137,6 +137,7 @@ function LongTermEventForm({
       serviceName: serviceName,
       startDate: convertToMySQLDateTime(startDate, formData.selectedTime),
       endDate: convertToMySQLDateTime(endDate, formData.selectedTime), // optional end time
+      selectedTime: formData.selectedTime,
       accommodation: formData.accommodation,
       note: formData.note,
       problems: formData.problems,

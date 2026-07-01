@@ -4,6 +4,40 @@ import { useEffect, useMemo, useState } from "react";
 import Loading from "../Loading";
 import ReservationList from "./ReservationList";
 
+function MetaRow({ label, value }) {
+  if (!value) return null;
+
+  return (
+    <div className="grid grid-cols-1 gap-1 border-t border-slate-200 py-3 first:border-t-0 first:pt-0 last:pb-0 sm:grid-cols-[190px_1fr] sm:gap-4">
+      <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+        {label}
+      </span>
+      <span
+        className="text-left text-sm text-slate-700 sm:text-right sm:text-[15px]"
+      >
+        {value}
+      </span>
+    </div>
+  );
+}
+
+function InfoField({ label, value, strong = false }) {
+  if (!value) return null;
+
+  return (
+    <div className="border-b border-slate-200 py-3 last:border-b-0">
+      <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+        {label}
+      </div>
+      <div
+        className={`mt-1 break-words text-sm leading-6 sm:text-[15px] ${strong ? "font-semibold text-slate-900" : "text-slate-700"}`}
+      >
+        {value}
+      </div>
+    </div>
+  );
+}
+
 export default function CanceledReservationsOverview({
   title = "Zrušené rezervácie",
 }) {
@@ -11,18 +45,54 @@ export default function CanceledReservationsOverview({
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sortOrder, setSortOrder] = useState("newest");
+  const [canceledByFilter, setCanceledByFilter] = useState("all");
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
   const formatDateSK = (date) => {
     if (!date) return "";
 
+    const parsedDate = new Date(date);
+    if (Number.isNaN(parsedDate.getTime())) return "";
+
     return new Intl.DateTimeFormat("sk-SK", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
-    }).format(new Date(date));
+    }).format(parsedDate);
   };
+
+  const formatDateTimeSK = (date) => {
+    if (!date) return "";
+
+    const parsedDate = new Date(date);
+    if (Number.isNaN(parsedDate.getTime())) return "";
+
+    const timeMatch =
+      typeof date === "string"
+        ? date.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?/)
+        : null;
+    const hasNonZeroTime =
+      Boolean(timeMatch) &&
+      (timeMatch[1] !== "00" ||
+        timeMatch[2] !== "00" ||
+        (timeMatch[3] ?? "00") !== "00");
+
+    return new Intl.DateTimeFormat("sk-SK", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      ...(hasNonZeroTime
+        ? {
+            hour: "2-digit",
+            minute: "2-digit",
+          }
+        : {}),
+    }).format(parsedDate);
+  };
+
+  const hasValidDogBirth = (value) =>
+    Boolean(value && value !== "0000-00-00" && formatDateSK(value));
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,40 +102,53 @@ export default function CanceledReservationsOverview({
         );
         const data = await response.json();
 
-        // Mapovanie pre ReservationList tak, aby v riadku boli len požadované info
-        const mappedData = data.map((item) => ({
-          ...item,
-          reservation_id: item.id,
-          event_name: item.service_name,
-          // Do email poľa v zozname môžeme v prípade potreby podstrčiť formátovanie
-          // ale ReservationList by mal natívne brať .email a .first_name/.last_name
-        }));
-
-        setReservations(mappedData);
+        setReservations(
+          data.map((item) => ({
+            ...item,
+            reservation_id: item.id,
+            event_name: item.service_name,
+          })),
+        );
       } catch (err) {
         console.error("Chyba pri načítaní dát:", err);
       } finally {
         setLoading(false);
       }
     };
+
     fetchData();
   }, []);
 
-  const normalize = (v) =>
-    String(v ?? "")
+  const normalize = (value) =>
+    String(value ?? "")
       .toLowerCase()
       .normalize("NFD")
       .replace(/\p{Diacritic}/gu, "");
 
   const filteredReservations = useMemo(() => {
     return [...reservations]
-      .filter((r) =>
-        [r.event_name, r.first_name, r.last_name, r.email].some((v) =>
-          normalize(v).includes(normalize(search)),
-        ),
+      .filter((reservation) =>
+        [
+          reservation.event_name,
+          reservation.first_name,
+          reservation.last_name,
+          reservation.email,
+          reservation.dog_name,
+          reservation.dog_breed,
+          reservation.canceled_by === "admin"
+            ? "admin zrušené adminom"
+            : reservation.canceled_by === "client"
+              ? "klient zrušené klientom"
+              : "",
+        ].some((value) => normalize(value).includes(normalize(search))),
       )
+      .filter((reservation) => {
+        if (canceledByFilter === "all") return true;
+        if (canceledByFilter === "unknown") return !reservation.canceled_by;
+        return reservation.canceled_by === canceledByFilter;
+      })
       .sort((a, b) => (sortOrder === "newest" ? b.id - a.id : a.id - b.id));
-  }, [reservations, search, sortOrder]);
+  }, [canceledByFilter, reservations, search, sortOrder]);
 
   const openModal = (item) => {
     setSelectedItem(item);
@@ -77,125 +160,211 @@ export default function CanceledReservationsOverview({
     setSelectedItem(null);
   };
 
+  const cancellationTimestamp = selectedItem?.created_at || "";
+  const reservationCreatedTimestamp =
+    selectedItem?.reservation_created_at || "";
+  const serviceDateRange =
+    selectedItem?.service_start && selectedItem?.service_end
+      ? `${selectedItem.service_start} - ${selectedItem.service_end}`
+      : "";
+
+  const canceledByLabel =
+    selectedItem?.canceled_by === "admin"
+      ? "Zrušené adminom"
+      : selectedItem?.canceled_by === "client"
+        ? "Zrušené klientom"
+        : "";
+
+  const canceledByBadgeClass =
+    selectedItem?.canceled_by === "admin"
+      ? "border-amber-200 bg-amber-50 text-amber-800"
+      : selectedItem?.canceled_by === "client"
+        ? "border-rose-200 bg-rose-50 text-rose-800"
+        : "border-slate-200 bg-slate-50 text-slate-700";
+
+  const dogDetailItems = [
+    selectedItem?.dog_name,
+    selectedItem?.dog_breed,
+    selectedItem?.dog_gender,
+    hasValidDogBirth(selectedItem?.dog_birth)
+      ? formatDateSK(selectedItem?.dog_birth)
+      : "",
+  ].filter(Boolean);
+
+  const hasDogDetails = dogDetailItems.length > 0;
+
   if (loading) return <Loading />;
 
   return (
-    <div className="space-y-8 p-4">
-      {/* Ovládacie prvky */}
-      <div className="flex flex-col md:flex-row gap-4 justify-between">
+    <div className="space-y-8 p-4 font-sans sm:p-5">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <input
           type="text"
           placeholder="Vyhľadávanie..."
-          className="border border-gray-500 px-4 py-2 w-full md:w-1/2 rounded-xl outline-none"
+          className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-slate-500 md:w-1/2"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
 
-        <select
-          className="border rounded-xl px-4 py-2 border-gray-500 bg-white outline-none cursor-pointer"
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value)}
-        >
-          <option value="newest">Najnovšie</option>
-          <option value="oldest">Najstaršie</option>
-        </select>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <select
+            className="cursor-pointer rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-slate-500"
+            value={canceledByFilter}
+            onChange={(e) => setCanceledByFilter(e.target.value)}
+          >
+            <option value="all">Všetky storná</option>
+            <option value="client">Zrušené klientom</option>
+            <option value="admin">Zrušené adminom</option>
+            <option value="unknown">Neuvedené</option>
+          </select>
+
+          <select
+            className="cursor-pointer rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-slate-500"
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+          >
+            <option value="newest">Najnovšie</option>
+            <option value="oldest">Najstaršie</option>
+          </select>
+        </div>
       </div>
 
-      {/* Zoznam - ReservationList zobrazí service_name, meno a email */}
       <ReservationList
         title={title}
         reservations={filteredReservations}
         onClick={openModal}
       />
 
-      {/* Modal Detail */}
       {modalVisible && selectedItem && (
         <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50"
           onClick={closeModal}
         >
           <div
-            className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative"
+            className="relative h-screen w-full max-w-4xl overflow-y-auto rounded-none bg-white shadow-2xl sm:rounded-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={closeModal}
-              className="absolute top-4 right-4 text-gray-500 hover:text-black text-xl font-bold"
+              className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full text-3xl leading-none text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 sm:right-5 sm:top-5"
+              aria-label="Zavrieť detail"
             >
-              ✕
+              ×
             </button>
 
-            <div className="p-8">
-              <h2 className="text-2xl font-bold mb-6 border-b pb-4 text-gray-800">
-                Detail rezervácie
-              </h2>
+            <div className="p-5 sm:p-8">
+              <div className="mb-6 border-b border-slate-200 pb-5">
+                <p className="pr-12 text-[30px] font-semibold leading-tight text-slate-900 sm:text-[34px]">
+                  Zrušenie rezervácie
+                </p>
+                <h2 className="mt-2 pr-12 text-lg font-semibold text-slate-800 sm:text-[22px]">
+                  {selectedItem.service_name}
+                </h2>
+                {serviceDateRange && (
+                  <p className="mt-2 pr-12 text-sm text-slate-600 sm:text-[15px]">
+                    {serviceDateRange}
+                  </p>
+                )}
+              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
-                <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
-                    Klient
-                  </label>
-                  <p className="text-lg font-medium text-gray-900">
-                    {selectedItem.first_name} {selectedItem.last_name}
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
-                    Služba
-                  </label>
-                  <p className="text-lg font-medium text-gray-900">
-                    {selectedItem.service_name}
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
-                    Email
-                  </label>
-                  <p className="text-lg text-gray-900">{selectedItem.email}</p>
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
-                    Telefón
-                  </label>
-                  <p className="text-lg text-gray-900 font-mono">
-                    {selectedItem.phone_number || "-"}
-                  </p>
+              <div className="mb-6 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-5 sm:px-5">
+                <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+                  <div className="min-w-0">
+                    <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                      Stav zrušenia
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <span
+                        className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${canceledByBadgeClass}`}
+                      >
+                        {canceledByLabel || "Neuvedené"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="min-w-0 w-full md:max-w-[420px]">
+                    <MetaRow
+                      label="Rezervácia vytvorená"
+                      value={formatDateTimeSK(reservationCreatedTimestamp)}
+                    />
+                    <MetaRow
+                      label="Rezervácia zrušená"
+                      value={formatDateTimeSK(cancellationTimestamp)}
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="mt-8 p-6 bg-gray-50 rounded-xl border border-gray-200 space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400 font-bold uppercase text-[10px]">
-                    Adresa
-                  </span>
-                  <span className="text-gray-700 text-right">
-                    {selectedItem.street}, {selectedItem.zip}{" "}
-                    {selectedItem.city}
-                  </span>
+              <div className="mb-6 rounded-2xl border border-slate-200 bg-white px-4 py-5 sm:px-6">
+                <div className="mb-4 border-b border-slate-200 pb-3">
+                  <h3 className="text-lg font-semibold text-slate-900">
+                    Detail
+                  </h3>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400 font-bold uppercase text-[10px]">
-                    Pôvodný termín
-                  </span>
-                  <span className="text-gray-900 font-medium">
-                    {selectedItem.service_start} — {selectedItem.service_end}
-                  </span>
-                </div>
-                {selectedItem.created_at && (
-                  <div className="flex justify-between text-sm border-t border-gray-200 pt-3">
-                    <span className="text-gray-400 font-bold uppercase text-[10px]">
-                      Vytvorené:
-                    </span>
-                    <span className="text-gray-500 font-mono">
-                      {formatDateSK(selectedItem.created_at)}
-                    </span>
+
+                <div
+                  className={`grid grid-cols-1 gap-5 ${
+                    hasDogDetails ? "lg:grid-cols-[minmax(0,0.9fr)_minmax(0,0.9fr)]" : ""
+                  }`}
+                >
+                  <div className={hasDogDetails ? "" : "w-full"}>
+                    <h4 className="mb-3 text-xs font-semibold uppercase tracking-widest text-slate-500">
+                      Klient
+                    </h4>
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 sm:px-5">
+                      <InfoField
+                        label="Meno"
+                        value={`${selectedItem.first_name || ""} ${selectedItem.last_name || ""}`.trim()}
+                        strong
+                      />
+                      <InfoField label="Email" value={selectedItem.email} />
+                      <InfoField
+                        label="Telefón"
+                        value={selectedItem.phone_number}
+                      />
+                      <InfoField
+                        label="Adresa"
+                        value={`${selectedItem.street || ""}, ${selectedItem.zip || ""} ${selectedItem.city || ""}`.trim()}
+                      />
+                    </div>
                   </div>
-                )}
+
+                  {hasDogDetails && (
+                    <div>
+                    <h4 className="mb-3 text-xs font-semibold uppercase tracking-widest text-slate-500">
+                      Pes
+                    </h4>
+                      <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 sm:px-5">
+                        <InfoField
+                          label="Meno psa"
+                          value={selectedItem.dog_name}
+                          strong
+                        />
+                        <InfoField
+                          label="Plemeno"
+                          value={selectedItem.dog_breed}
+                        />
+                        <InfoField
+                          label="Pohlavie"
+                          value={selectedItem.dog_gender}
+                        />
+                        <InfoField
+                          label="Dátum narodenia"
+                          value={
+                            hasValidDogBirth(selectedItem.dog_birth)
+                              ? formatDateSK(selectedItem.dog_birth)
+                              : ""
+                          }
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <button
                 onClick={closeModal}
-                className="mt-8 w-full py-3 bg-gray-800 text-white rounded-xl font-bold hover:bg-black transition-all active:scale-[0.98]"
+                className="mt-8 w-full rounded-2xl bg-slate-900 py-4 text-sm font-semibold text-white transition hover:bg-slate-800"
               >
                 Zavrieť detail
               </button>

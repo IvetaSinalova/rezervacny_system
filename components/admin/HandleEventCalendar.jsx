@@ -119,7 +119,29 @@ export default function EventCalendar({
   };
 
   const handleChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData((prev) => {
+      if (field !== "start") {
+        return { ...prev, [field]: value };
+      }
+
+      const isLongTermReservationEvent = Boolean(
+        selectedEvent?.extendedProps?.reservations?.[0]
+          ?.long_term_reservation_id,
+      );
+
+      if (!isLongTermReservationEvent || !prev.end || !value.includes("T")) {
+        return { ...prev, [field]: value };
+      }
+
+      const [newStartDate] = value.split("T");
+      const [, currentEndTime = "00:00"] = prev.end.split("T");
+
+      return {
+        ...prev,
+        [field]: value,
+        end: `${newStartDate}T${currentEndTime}`,
+      };
+    });
   };
 
   const handleDeleteClik = (e, reservation) => {
@@ -439,8 +461,17 @@ export default function EventCalendar({
       />
 
       {modalVisible && (
-        <div className="modal-overlay fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
-          <div className="relative bg-white p-6 shadow-xl w-full max-w-3xl h-[calc(100vh)] overflow-y-auto">
+        <div
+          className="modal-overlay fixed inset-0 z-[9999] flex items-center justify-center bg-black/50"
+          onClick={() => {
+            setModalVisible(false);
+            setEditType("event");
+          }}
+        >
+          <div
+            className="relative h-screen w-full max-w-4xl overflow-y-auto rounded-none bg-white p-5 shadow-2xl sm:rounded-2xl sm:p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               onClick={() => {
                 setModalVisible(false);

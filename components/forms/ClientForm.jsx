@@ -92,16 +92,13 @@ export const ClientForm = forwardRef(({ autofill, onAutofilled }, ref) => {
       setIsLoading(true);
       // Note: Replace 'yourdomain.com' with your actual site URL
       // or use a relative path if the React app is hosted on the same domain
-      const response = await fetch(
-        "https://www.psiaskola.sk/wp-json/events/v1/get-client-info",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email }),
+      const response = await fetch("/api/wp/events/v1/get-client-info", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({ email }),
+      });
 
       const data = await response.json();
       if (!response.ok) {

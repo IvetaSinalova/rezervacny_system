@@ -101,22 +101,22 @@ export default function ReservationsOverview({
       {/* Modal */}
       {modalVisible && selectedReservation && (
         <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50"
           onClick={closeModal}
         >
           <div
-            className="bg-white rounded-2xl shadow-xl max-w-4xl w-full  overflow-y-auto p-6 relative h-screen"
+            className="relative h-screen w-full max-w-4xl overflow-y-auto rounded-none bg-white shadow-2xl sm:rounded-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close button */}
             <button
               onClick={closeModal}
-              className="absolute top-3 right-3 text-gray-500 hover:text-black text-xl font-bold"
+              className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full text-xl font-bold text-gray-500 transition hover:bg-slate-100 hover:text-black"
               aria-label="Close modal"
             >
               ✕
             </button>
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-5 sm:p-6">
               <ReservationDetail
                 reservationProps={selectedReservation}
                 onReservationUpdate={(updatedReservation) => {
