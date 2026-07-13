@@ -5,6 +5,7 @@ export default function ReservationList({
   onClick,
   range = false,
   dateLabel,
+  getReservationStatus,
 }) {
   const formatDateSK = (date) => {
     if (!date) return "";
@@ -29,6 +30,24 @@ export default function ReservationList({
       : value === "client"
         ? "border-rose-200 bg-rose-50 text-rose-800"
         : "border-slate-200 bg-slate-50 text-slate-600";
+
+  const statusLabel = (value) =>
+    value === "active"
+      ? "Aktívne"
+      : value === "future"
+        ? "Budúce"
+        : value === "ended"
+          ? "Ukončené"
+          : "";
+
+  const statusBadgeClass = (value) =>
+    value === "active"
+      ? "border-[var(--color-tertiary)] bg-[var(--color-tertiary)]/10 text-[var(--color-tertiary)]"
+      : value === "future"
+        ? "border-[var(--color-secondary)] bg-[var(--color-light)] text-[var(--color-primary)]"
+        : value === "ended"
+          ? "border-gray-200 bg-gray-100 text-gray-700"
+          : "border-slate-200 bg-slate-50 text-slate-600";
 
   return (
     <div className="bg-white shadow-xl rounded-2xl p-6">
@@ -57,6 +76,15 @@ export default function ReservationList({
                       className={`inline-flex rounded-full border px-2.5 py-0.5 text-xs font-semibold ${canceledByBadgeClass(r.canceled_by)}`}
                     >
                       {canceledByLabel(r.canceled_by)}
+                    </span>
+                  )}
+                  {getReservationStatus && (
+                    <span
+                      className={`inline-flex rounded-full border px-2.5 py-0.5 text-xs font-semibold ${statusBadgeClass(
+                        getReservationStatus(r),
+                      )}`}
+                    >
+                      {statusLabel(getReservationStatus(r))}
                     </span>
                   )}
                 </div>

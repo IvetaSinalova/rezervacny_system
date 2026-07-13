@@ -49,6 +49,10 @@ export default function AdminNavbar() {
           href: "/admin/long-term-reservations-overview",
         },
         {
+          label: "Ubytované psy podľa dní",
+          href: "/admin/accommodated-dogs-overview",
+        },
+        {
           label: "Zrušené rezervácie",
           href: "/admin/canceled-reservations",
         },
@@ -90,7 +94,7 @@ export default function AdminNavbar() {
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link
-            href="/admin/dashboard"
+            href="/admin/overview"
             className="flex items-center gap-3 group"
           >
             <div>
@@ -116,6 +120,9 @@ export default function AdminNavbar() {
           <button
             className="md:hidden p-2 rounded-lg hover:bg-black/10 transition"
             onClick={() => setOpen(!open)}
+            aria-label={open ? "Zavrieť navigáciu" : "Otvoriť navigáciu"}
+            aria-expanded={open}
+            aria-controls="admin-mobile-navigation"
           >
             {open ? (
               <svg
@@ -159,13 +166,16 @@ export default function AdminNavbar() {
 
       {/* Mobile Sidebar (WHITE BACKGROUND) */}
       <div
+        id="admin-mobile-navigation"
         className={`fixed top-0 right-0 h-full w-full max-w-[300px] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-50 md:hidden overflow-x-hidden ${open ? "translate-x-0" : "translate-x-full"}`}
+        aria-hidden={!open}
       >
         <div className="p-4 flex flex-col h-full text-gray-800">
           <div className="flex justify-between items-center mb-8 border-b border-gray-100 pb-2">
             <button
               onClick={closeMenu}
               className="p-2 hover:bg-gray-100 rounded-full text-gray-500 ml-auto flex items-center justify-center"
+              aria-label="Zavrieť navigáciu"
             >
               <svg
                 className="w-6 h-6"
@@ -213,7 +223,7 @@ export default function AdminNavbar() {
           </div>
 
           <button
-            onClick={() => signOut({ callbackUrl: "/" })}
+            onClick={() => signOut({ callbackUrl: "/admin/login" })}
             className="mt-6 w-full bg-[#59513f] text-white py-4 rounded-xl font-bold hover:bg-[#453e30] transition active:scale-95 shadow-lg"
           >
             Odhlásiť sa

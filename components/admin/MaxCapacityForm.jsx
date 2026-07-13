@@ -1,9 +1,10 @@
 "use client";
 import React, { useState, useEffect } from "react";
 
-export default function MaxCapacityForm({ updateLoading }) {
+export default function MaxCapacityForm() {
   const [value, setValue] = useState("");
   const [initialLoading, setInitialLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [dots, setDots] = useState(".");
 
   // Fetch the current capacity on mount.
@@ -15,12 +16,10 @@ export default function MaxCapacityForm({ updateLoading }) {
           setValue(String(data.maxCapacity));
         }
         setInitialLoading(false);
-        updateLoading && updateLoading(false);
       })
       .catch((err) => {
         console.error(err);
         setInitialLoading(false);
-        updateLoading && updateLoading(false);
       });
   }, []);
 
@@ -34,13 +33,14 @@ export default function MaxCapacityForm({ updateLoading }) {
   }, [initialLoading]);
 
   const handleSubmit = async () => {
+    if (isSubmitting) return;
     const n = parseInt(value, 10);
     if (!value.toString().trim() || isNaN(n) || n < 0) {
       alert("Zadajte platné číslo (0 alebo viac)");
       return;
     }
 
-    updateLoading && updateLoading(true); // full-page loading via parent
+    setIsSubmitting(true);
 
     try {
       const res = await fetch(
@@ -52,8 +52,6 @@ export default function MaxCapacityForm({ updateLoading }) {
         },
       );
       const data = await res.json();
-      updateLoading && updateLoading(false);
-
       if (data.success) {
         alert("Kapacita bola úspešne uložená!");
         setValue(String(n));
@@ -61,9 +59,10 @@ export default function MaxCapacityForm({ updateLoading }) {
         alert("Chyba pri ukladaní kapacity!");
       }
     } catch (err) {
-      updateLoading && updateLoading(false);
       console.error(err);
       alert("Chyba pri ukladaní kapacity!");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -96,7 +95,7 @@ export default function MaxCapacityForm({ updateLoading }) {
 
       <button
         onClick={handleSubmit}
-        disabled={initialLoading}
+        disabled={initialLoading || isSubmitting}
         style={{
           marginTop: "1rem",
           backgroundColor: "var(--color-primary)",
@@ -104,11 +103,11 @@ export default function MaxCapacityForm({ updateLoading }) {
           padding: "0.5rem 1rem",
           border: "none",
           borderRadius: "4px",
-          cursor: initialLoading ? "not-allowed" : "pointer",
-          opacity: initialLoading ? 0.6 : 1,
+          cursor: initialLoading || isSubmitting ? "not-allowed" : "pointer",
+          opacity: initialLoading || isSubmitting ? 0.6 : 1,
         }}
       >
-        Uložiť
+        {isSubmitting ? "Ukladám…" : "Uložiť"}
       </button>
     </div>
   );

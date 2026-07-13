@@ -12,6 +12,7 @@ export default function ReservationsOverview({
   const [search, setSearch] = useState("");
   const [reservations, setReservations] = useState(reservationsProps);
   const [sortOrder, setSortOrder] = useState("newest");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -28,6 +29,18 @@ export default function ReservationsOverview({
 
   // Filter + sort helper
   // Filter + sort helper
+  const getReservationStatus = (reservation) => {
+    const now = new Date();
+    const start = new Date(reservation.start_date);
+    const end = new Date(reservation.end_date || reservation.start_date);
+
+    if (Number.isNaN(start.getTime())) return "active";
+    if (start > now) return "future";
+    if (!Number.isNaN(end.getTime()) && end < now) return "ended";
+    return "active";
+  };
+
+
   const filterAndSort = (data) => {
     return [...data]
       .filter((r) =>
@@ -39,6 +52,9 @@ export default function ReservationsOverview({
           r.phone_number,
           r.dog_name,
         ].some((v) => normalize(v).includes(normalize(search))),
+      )
+      .filter(
+        (r) => statusFilter === "all" || getReservationStatus(r) === statusFilter,
       )
       .sort((a, b) => {
         if (sortOrder === "newest") {
@@ -52,7 +68,7 @@ export default function ReservationsOverview({
   // Memoized data
   const filteredReservations = useMemo(
     () => filterAndSort(reservations),
-    [reservations, search, sortOrder],
+    [reservations, search, sortOrder, statusFilter],
   );
 
   // Open modal
@@ -69,8 +85,7 @@ export default function ReservationsOverview({
 
   return (
     <div className="space-y-8">
-      {/* Controls */}
-      <div className="flex flex-col md:flex-row gap-4 justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <input
           type="text"
           placeholder="Vyhľadávanie..."
@@ -79,15 +94,29 @@ export default function ReservationsOverview({
           onChange={(e) => setSearch(e.target.value)}
         />
 
-        <select
-          className="border rounded-xl px-4 py-2 border-gray-500"
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value)}
-        >
-          <option value="newest">Najnovšie</option>
-          <option value="oldest">Najstaršie</option>
-        </select>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <select
+            className="border rounded-xl px-4 py-2 border-gray-500"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="all">Všetky statusy</option>
+            <option value="active">Aktívne</option>
+            <option value="future">Budúce</option>
+            <option value="ended">Ukončené</option>
+          </select>
+
+          <select
+            className="border rounded-xl px-4 py-2 border-gray-500"
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+          >
+            <option value="newest">Najnovšie</option>
+            <option value="oldest">Najstaršie</option>
+          </select>
+        </div>
       </div>
+
 
       {/* Long-term reservations */}
       <ReservationList
@@ -96,6 +125,7 @@ export default function ReservationsOverview({
         onClick={openModal}
         dateLabel={range ? "Obdobie" : "Termín"}
         range={range}
+        getReservationStatus={getReservationStatus}
       />
 
       {/* Modal */}
@@ -114,7 +144,7 @@ export default function ReservationsOverview({
               className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full text-xl font-bold text-gray-500 transition hover:bg-slate-100 hover:text-black"
               aria-label="Close modal"
             >
-              ✕
+              ×
             </button>
             <div className="flex-1 overflow-y-auto p-5 sm:p-6">
               <ReservationDetail

@@ -6,6 +6,7 @@ import Loading from "../Loading";
 export default function AccommodationsAdmin({ accommodationsProps, loading }) {
   const [accommodations, setAccommodations] = useState(accommodationsProps);
   const [editedAccommodations, setEditedAccommodations] = useState({});
+  const [pendingAction, setPendingAction] = useState("");
 
   // Form state for new accommodation
   const [newAccommodation, setNewAccommodation] = useState({
@@ -34,6 +35,8 @@ export default function AccommodationsAdmin({ accommodationsProps, loading }) {
   // CREATE
   const handleCreate = async (e) => {
     e.preventDefault();
+    if (pendingAction) return;
+    setPendingAction("create");
     try {
       const res = await fetch(
         "/api/wp/events/v1/create-accomodation",
@@ -50,17 +53,21 @@ export default function AccommodationsAdmin({ accommodationsProps, loading }) {
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setPendingAction("");
     }
   };
 
   // UPDATE
   const handleSaveChanges = async () => {
+    if (pendingAction) return;
     const updates = Object.keys(editedAccommodations).map((id) => ({
       id,
       ...editedAccommodations[id],
     }));
 
     if (updates.length === 0) return; // nothing to update
+    setPendingAction("save");
     try {
       const res = await fetch(
         "/api/wp/events/v1/update-accomodations",
@@ -81,12 +88,16 @@ export default function AccommodationsAdmin({ accommodationsProps, loading }) {
     } catch (err) {
       console.error(err);
       alert("Chyba pri ukladaní zmien!");
+    } finally {
+      setPendingAction("");
     }
   };
 
   // DELETE
   const handleDelete = async (id) => {
+    if (pendingAction) return;
     if (!confirm("Naozaj chcete vymazať túto položku?")) return;
+    setPendingAction(`delete-${id}`);
     try {
       await fetch(
         "/api/wp/events/v1/delete-accomodation",
@@ -104,6 +115,8 @@ export default function AccommodationsAdmin({ accommodationsProps, loading }) {
       });
     } catch (err) {
       console.error(err);
+    } finally {
+      setPendingAction("");
     }
   };
 
@@ -236,11 +249,14 @@ export default function AccommodationsAdmin({ accommodationsProps, loading }) {
                 >
                   <button
                     type="button"
+                    onClick={() => handleDelete(item.id)}
+                    disabled={Boolean(pendingAction)}
                     style={{
                       background: "#c0392b",
                       color: "#fff",
                       padding: "0.5rem",
-                      cursor: "pointer",
+                      cursor: pendingAction ? "not-allowed" : "pointer",
+                      opacity: pendingAction ? 0.6 : 1,
                     }}
                   >
                     X
@@ -318,16 +334,18 @@ export default function AccommodationsAdmin({ accommodationsProps, loading }) {
               >
                 <button
                   onClick={handleCreate}
+                  disabled={Boolean(pendingAction)}
                   style={{
                     backgroundColor: "var(--color-primary)",
                     color: "white",
                     border: "none",
                     borderRadius: "4px",
                     padding: "0.25rem 0.5rem",
-                    cursor: "pointer",
+                    cursor: pendingAction ? "not-allowed" : "pointer",
+                    opacity: pendingAction ? 0.6 : 1,
                   }}
                 >
-                  Pridať
+                  {pendingAction === "create" ? "Pridávam…" : "Pridať"}
                 </button>
               </td>
             </tr>
@@ -337,6 +355,7 @@ export default function AccommodationsAdmin({ accommodationsProps, loading }) {
 
       <button
         onClick={handleSaveChanges}
+        disabled={Boolean(pendingAction) || Object.keys(editedAccommodations).length === 0}
         style={{
           marginTop: "1rem",
           backgroundColor: "var(--color-primary)",
@@ -344,10 +363,17 @@ export default function AccommodationsAdmin({ accommodationsProps, loading }) {
           padding: "0.5rem 1rem",
           border: "none",
           borderRadius: "4px",
-          cursor: "pointer",
+          cursor:
+            pendingAction || Object.keys(editedAccommodations).length === 0
+              ? "not-allowed"
+              : "pointer",
+          opacity:
+            pendingAction || Object.keys(editedAccommodations).length === 0
+              ? 0.6
+              : 1,
         }}
       >
-        Uložiť zmeny
+        {pendingAction === "save" ? "Ukladám…" : "Uložiť zmeny"}
       </button>
     </div>
   );

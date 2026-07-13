@@ -6,12 +6,8 @@ import MaxCapacityForm from "./MaxCapacityForm";
 export default function LongTermEventTable() {
   const [events, setEvents] = useState([]);
   const [editedEvents, setEditedEvents] = useState({});
-  const [newEvent, setNewEvent] = useState({
-    name: "",
-    price: "",
-    fixed_days: "",
-  });
   const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     fetch("/api/wp/events/v1/long-term-events")
@@ -38,13 +34,14 @@ export default function LongTermEventTable() {
   };
 
   const handleSaveChanges = async () => {
-    setLoading(true);
+    if (isSaving) return;
     const updates = Object.keys(editedEvents).map((id) => ({
       id,
       ...editedEvents[id],
     }));
 
     if (updates.length === 0) return;
+    setIsSaving(true);
     try {
       const res = await fetch(
         "/api/wp/events/v1/update-long-term-events",
@@ -55,57 +52,15 @@ export default function LongTermEventTable() {
         },
       );
       const data = await res.json();
-      setLoading(false);
       if (data.success) {
         alert(`Všetky zmeny uložené! (${data.updated} položiek)`);
         setEditedEvents({});
       } else alert("Chyba pri ukladaní zmien!");
     } catch (err) {
-      setLoading(false);
       console.error(err);
       alert("Chyba pri ukladaní zmien!");
-    }
-  };
-
-  const handleCreate = async () => {
-    try {
-      const res = await fetch(
-        "/api/wp/events/v1/create-long-term-event",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newEvent),
-        },
-      );
-      const data = await res.json();
-      if (data.id) {
-        setEvents((prev) => [...prev, { ...newEvent, id: data.id }]);
-        setNewEvent({ name: "", price: "", fixed_days: "" });
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (!confirm("Naozaj chcete vymazať túto položku?")) return;
-    try {
-      await fetch(
-        "/api/wp/events/v1/delete-long-term-event",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id }),
-        },
-      );
-      setEvents((prev) => prev.filter((item) => item.id !== id));
-      setEditedEvents((prev) => {
-        const copy = { ...prev };
-        delete copy[id];
-        return copy;
-      });
-    } catch (err) {
-      console.error(err);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -249,6 +204,7 @@ export default function LongTermEventTable() {
       </div>
       <button
         onClick={handleSaveChanges}
+        disabled={isSaving || Object.keys(editedEvents).length === 0}
         style={{
           marginTop: "1rem",
           backgroundColor: "var(--color-primary)",
@@ -256,12 +212,16 @@ export default function LongTermEventTable() {
           padding: "0.5rem 1rem",
           border: "none",
           borderRadius: "4px",
-          cursor: "pointer",
+          cursor:
+            isSaving || Object.keys(editedEvents).length === 0
+              ? "not-allowed"
+              : "pointer",
+          opacity: isSaving || Object.keys(editedEvents).length === 0 ? 0.6 : 1,
         }}
       >
-        Uložiť zmeny
+        {isSaving ? "Ukladám…" : "Uložiť zmeny"}
       </button>
-      <MaxCapacityForm updateLoading={(value) => setLoading(value)} />
+      <MaxCapacityForm />
     </div>
   );
 }

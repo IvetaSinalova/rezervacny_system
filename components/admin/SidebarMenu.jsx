@@ -33,6 +33,10 @@ export default function SidebarMenu() {
           href: "/admin/long-term-reservations-overview",
         },
         {
+          label: "Ubytované psy podľa dní",
+          href: "/admin/accommodated-dogs-overview",
+        },
+        {
           label: "Zrušené rezervácie",
           href: "/admin/canceled-reservations",
         },

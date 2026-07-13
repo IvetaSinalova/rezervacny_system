@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -45,6 +45,81 @@ export default function EventCalendar({
   const [loadReturnDogs, setLoadReturnDogs] = useState(false);
   const [existsReturnDog, setExistsReturnDog] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [visibleRange, setVisibleRange] = useState(null);
+
+  const isImportantHandoverEvent = (event) => {
+    const title = String(event.title || "").toLowerCase();
+    const eventTypeId = String(
+      event.eventTypeId ?? event.extendedProps?.eventTypeId ?? "",
+    );
+    const isHandover = title.includes("odovzd") || eventTypeId === "14";
+    if (!isHandover) return false;
+
+    const reservations =
+      event.reservations || event.extendedProps?.reservations || [];
+
+    return reservations.some((reservation) =>
+      ["1", "2"].includes(String(reservation.long_term_event_type_id ?? "")),
+    );
+  };
+
+  const odovzdavkaOverlapWarnings = useMemo(() => {
+    const warnings = [];
+    const warningEventIds = new Set();
+    const visibleStart = visibleRange?.start
+      ? new Date(visibleRange.start)
+      : null;
+    const visibleEnd = visibleRange?.end ? new Date(visibleRange.end) : null;
+    const handoverEvents = events.filter((event) => {
+      const eventStart = new Date(event.start);
+
+      if (!isImportantHandoverEvent(event)) return false;
+      if (!visibleStart || !visibleEnd) return true;
+      return eventStart >= visibleStart && eventStart < visibleEnd;
+    });
+
+    for (let i = 0; i < handoverEvents.length; i += 1) {
+      for (let j = i + 1; j < handoverEvents.length; j += 1) {
+        const first = handoverEvents[i];
+        const second = handoverEvents[j];
+        const firstStart = new Date(first.start);
+        const firstEnd = new Date(first.end || first.start);
+        const secondStart = new Date(second.start);
+        const secondEnd = new Date(second.end || second.start);
+
+        if (
+          Number.isNaN(firstStart.getTime()) ||
+          Number.isNaN(firstEnd.getTime()) ||
+          Number.isNaN(secondStart.getTime()) ||
+          Number.isNaN(secondEnd.getTime())
+        ) {
+          continue;
+        }
+
+        const sameDay =
+          firstStart.toDateString() === secondStart.toDateString();
+        const overlapsInTime = firstStart < secondEnd && secondStart < firstEnd;
+
+        if (sameDay && overlapsInTime) {
+          warningEventIds.add(String(first.id));
+          warningEventIds.add(String(second.id));
+          warnings.push({
+            id: `${first.id}-${second.id}`,
+            firstTitle: first.title,
+            secondTitle: second.title,
+            start: first.start,
+          });
+        }
+      }
+    }
+
+    return {
+      warnings,
+      eventIds: warningEventIds,
+    };
+  }, [events, visibleRange]);
+
+  const odovzdavkaWarningEventIds = odovzdavkaOverlapWarnings.eventIds;
 
   useEffect(() => {
     if (calendarRef.current) {
@@ -163,18 +238,15 @@ export default function EventCalendar({
           ? (reservationToDelete.long_term_reservation_id ??
             reservationToDelete.reservation_id)
           : reservationToDelete.event_reservation_id;
-      const response = await fetch(
-        "/api/wp/events/v1/delete-user-from-event",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id: reservation_id,
-          }),
+      const response = await fetch("/api/wp/events/v1/delete-user-from-event", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          id: reservation_id,
+        }),
+      });
 
       const data = await response.json();
 
@@ -204,7 +276,7 @@ export default function EventCalendar({
   //   e.preventDefault();
   //   setReservationToAnnul(reservation);
   //   setConfirmMsg(
-  //     `Naozaj chcete anulovať všetky absolvované kurzy zvoleného typu pre užívateľa ${reservation.first_name} ${reservation.last_name}?`
+  //     `Naozaj chcete anulovať všetky absolvované kurzy zvoleného typu pre používateľa ${reservation.first_name} ${reservation.last_name}?`
   //   );
   //   setConfirmVisible(true);
   // };
@@ -259,21 +331,18 @@ export default function EventCalendar({
   };
 
   const createReturnEvent = async () => {
-    const response = await fetch(
-      "/api/wp/events/v1/plan-dog-return",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          reservation_id: longTermId,
-          start_date: formData.start,
-          end_date: formData.end,
-          note: formData.note,
-        }),
+    const response = await fetch("/api/wp/events/v1/plan-dog-return", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        reservation_id: longTermId,
+        start_date: formData.start,
+        end_date: formData.end,
+        note: formData.note,
+      }),
+    });
 
     const result = await response.json();
 
@@ -364,14 +433,11 @@ export default function EventCalendar({
     if (!confirm("Naozaj chcete odstrániť túto udalosť?")) return;
     setSubmitBtnClicked(true);
     try {
-      const res = await fetch(
-        "/api/wp/events/v1/delete-calendar-event",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: selectedEvent.id }), // <-- must be correct
-        },
-      );
+      const res = await fetch("/api/wp/events/v1/delete-calendar-event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: selectedEvent.id }), // <-- must be correct
+      });
       const data = await res.json();
       if (data.success) {
         setEvents((prev) => prev.filter((ev) => ev.id !== selectedEvent.id));
@@ -389,6 +455,30 @@ export default function EventCalendar({
 
   return (
     <div className="TrainingContainerAdmin">
+      {odovzdavkaOverlapWarnings.warnings.length > 0 && (
+        <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800 shadow-sm">
+          <div className="font-semibold">2 odovzdávky naraz</div>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {odovzdavkaOverlapWarnings.warnings.map((warning) => (
+              <button
+                key={warning.id}
+                type="button"
+                onClick={() => {
+                  const calendarApi = calendarRef.current?.getApi();
+                  if (calendarApi && warning.start) {
+                    calendarApi.gotoDate(warning.start);
+                  }
+                }}
+                className="rounded-full border border-red-200 bg-white px-3 py-1 text-xs font-semibold text-red-800"
+              >
+                {new Date(warning.start).toLocaleDateString("sk-SK")} -{" "}
+                {warning.firstTitle} / {warning.secondTitle}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <FullCalendar
         ref={calendarRef}
         plugins={[timeGridPlugin, interactionPlugin]}
@@ -429,11 +519,24 @@ export default function EventCalendar({
           month: "2-digit",
           day: "2-digit",
         }}
+        datesSet={(info) =>
+          setVisibleRange({ start: info.startStr, end: info.endStr })
+        }
         events={events}
+        eventClassNames={(info) =>
+          odovzdavkaWarningEventIds.has(String(info.event.id))
+            ? ["important-handover-overlap"]
+            : []
+        }
         select={(selection) => openModal(null, selection)}
         eventClick={(info) => openModal(info.event)}
         eventContent={(info) => (
           <div style={{ position: "relative" }}>
+            {odovzdavkaWarningEventIds.has(String(info.event.id)) && (
+              <div className="absolute right-0 top-0 z-10 flex h-5 w-5 -translate-y-1 translate-x-1 items-center justify-center rounded-full border border-white bg-red-700 text-xs font-bold leading-none text-white shadow">
+                !
+              </div>
+            )}
             <b>{info.event.title}</b>
             <span style={{ fontSize: "0.8em", display: "block" }}>
               {new Date(info.event.start).toLocaleTimeString([], {
@@ -478,8 +581,9 @@ export default function EventCalendar({
                 setEditType("event");
               }}
               className="absolute top-3 right-3 w-10 h-10 flex items-center justify-center rounded-full border border-[var(--color-secondary)] text-[var(--color-secondary)] text-2xl hover:bg-[var(--color-secondary)] hover:text-white transition-all"
+              aria-label="Close modal"
             >
-              ×
+              x
             </button>
             <form onSubmit={handleSubmit} className="modal-form">
               <h3

@@ -27,6 +27,7 @@ export default withAuth(
 export const config = {
   matcher: [
     "/admin/3day-camp-reservation/:path*",
+    "/admin/accommodated-dogs-overview/:path*",
     "/admin/accomodation/:path*",
     "/admin/canceled-reservations/:path*",
     "/admin/create-daily-hotel-reservation/:path*",

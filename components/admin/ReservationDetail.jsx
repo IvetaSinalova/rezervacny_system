@@ -109,6 +109,15 @@ function ReservationDetail({
       ? "prevychova"
       : "vycvik";
 
+  const extraDays = Number(reservation?.extra_days ?? 0);
+  const newHandoverDate =
+    reservation?.new_handover_date ||
+    (extraDays > 0 && reservation?.end_date
+      ? new Date(
+          new Date(reservation.end_date).getTime() + extraDays * 86400000,
+        ).toISOString()
+      : null);
+
   useEffect(() => {
     if (reservationProps?.reservation_type !== "long_term") return;
 
@@ -448,10 +457,17 @@ function ReservationDetail({
             Vytvorené: {formatDateTimeSK(reservation.created_at)}
           </div>
         )}
-        {reservation.extra_days && reservation.extra_days > 0 && (
-          <div className="text-red-500 text-xl font-bold text-center">
-            +{reservation.extra_days}{" "}
-            {reservation.extra_days > 1 ? "dní" : "deň"}
+        {extraDays > 0 && (
+          <div className="mt-2 px-2 text-center">
+            <div className="text-red-500 text-xl font-bold">
+              +{extraDays}{" "}
+              {extraDays > 1 ? "dní" : "deň"}
+            </div>
+            {newHandoverDate && (
+              <div className="mt-1 text-sm font-semibold text-gray-700">
+                Nový termín odovzdania - {formatDateTimeSK(newHandoverDate)}
+              </div>
+            )}
           </div>
         )}
 

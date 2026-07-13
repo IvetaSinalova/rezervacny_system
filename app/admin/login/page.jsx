@@ -1,24 +1,35 @@
 "use client";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
+import Image from "next/image";
 
 export default function AdminLogin() {
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleLogin(e) {
     e.preventDefault();
+    if (isSubmitting) return;
 
-    const res = await signIn("credentials", {
-      redirect: false,
-      email: e.target.email.value,
-      password: e.target.password.value,
-      callbackUrl: "/admin/overview",
-    });
+    setIsSubmitting(true);
+    setError("");
 
-    if (res?.error) {
-      setError("Nesprávny email alebo heslo");
-    } else if (res.url) {
-      window.location.href = res.url; // manually redirect
+    try {
+      const res = await signIn("credentials", {
+        redirect: false,
+        email: e.target.email.value,
+        password: e.target.password.value,
+        callbackUrl: "/admin/overview",
+      });
+
+      if (res?.error) {
+        setError("Nesprávny email alebo heslo");
+      } else if (res?.url) {
+        window.location.href = res.url;
+        return;
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -26,7 +37,7 @@ export default function AdminLogin() {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-sm rounded-2xl shadow-xl p-8">
         <div className="flex justify-center mb-6">
-          <img src="/logo.jpg" alt="Logo" className="w-24 h-auto" />
+          <Image src="/logo.jpg" alt="Logo" width={96} height={96} className="h-auto" priority />
         </div>
 
         <h2 className="text-2xl font-semibold text-center mb-6 text-[#302D23]">
@@ -52,9 +63,10 @@ export default function AdminLogin() {
 
           <button
             type="submit"
-            className="bg-[#302D23] text-white py-2 rounded-lg hover:bg-opacity-90 transition"
+            disabled={isSubmitting}
+            className="bg-[#302D23] text-white py-2 rounded-lg hover:bg-opacity-90 transition disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Prihlásiť sa
+            {isSubmitting ? "Prihlasujem…" : "Prihlásiť sa"}
           </button>
         </form>
 
