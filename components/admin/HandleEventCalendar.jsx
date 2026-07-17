@@ -10,6 +10,11 @@ import ParticipantsList from "./ParticipantList";
 import Loading from "../Loading";
 import ReservationDetail from "./ReservationDetail";
 import ClientPicker from "./ClientPicker";
+import {
+  updateCalendarEvent,
+  updateCalendarFormDate,
+  updateCalendarReservation,
+} from "./calendarState.mjs";
 
 export default function EventCalendar({
   events: initialEvents,
@@ -120,6 +125,49 @@ export default function EventCalendar({
   }, [events, visibleRange]);
 
   const odovzdavkaWarningEventIds = odovzdavkaOverlapWarnings.eventIds;
+  const selectedEventFromState = selectedEvent
+    ? events.find((event) => String(event.id) === String(selectedEvent.id))
+    : null;
+  const selectedEventStateReservations = Array.isArray(
+    selectedEventFromState?.reservations,
+  )
+    ? selectedEventFromState.reservations
+    : [];
+  const selectedEventExtendedReservations = Array.isArray(
+    selectedEvent?.extendedProps?.reservations,
+  )
+    ? selectedEvent.extendedProps.reservations
+    : [];
+  const selectedEventReservations = selectedEventStateReservations.length
+    ? selectedEventStateReservations
+    : selectedEventExtendedReservations;
+
+  const updateSelectedReservation = (updates, reservationId = null) => {
+    setEvents((prevEvents) =>
+      updateCalendarReservation(
+        prevEvents,
+        selectedEvent?.id,
+        updates,
+        reservationId,
+      ),
+    );
+  };
+
+  const refreshCalendarEvents = async () => {
+    const response = await fetch(
+      "/api/wp/events/v1/all-calendar-events-with-clients",
+      { cache: "no-store" },
+    );
+
+    if (!response.ok) {
+      throw new Error("Calendar events could not be refreshed.");
+    }
+
+    const refreshedEvents = await response.json();
+    if (Array.isArray(refreshedEvents)) {
+      setEvents(refreshedEvents);
+    }
+  };
 
   useEffect(() => {
     if (calendarRef.current) {
@@ -195,27 +243,16 @@ export default function EventCalendar({
 
   const handleChange = (field, value) => {
     setFormData((prev) => {
-      if (field !== "start") {
-        return { ...prev, [field]: value };
-      }
-
       const isLongTermReservationEvent = Boolean(
-        selectedEvent?.extendedProps?.reservations?.[0]
-          ?.long_term_reservation_id,
+        selectedEventReservations?.[0]?.long_term_reservation_id,
       );
 
-      if (!isLongTermReservationEvent || !prev.end || !value.includes("T")) {
-        return { ...prev, [field]: value };
-      }
-
-      const [newStartDate] = value.split("T");
-      const [, currentEndTime = "00:00"] = prev.end.split("T");
-
-      return {
-        ...prev,
-        [field]: value,
-        end: `${newStartDate}T${currentEndTime}`,
-      };
+      return updateCalendarFormDate(
+        prev,
+        field,
+        value,
+        isLongTermReservationEvent,
+      );
     });
   };
 
@@ -265,7 +302,7 @@ export default function EventCalendar({
       setEditType("event");
       setReservationToDelete(null);
       return data;
-    } catch (err) {
+    } catch {
       setSubmitBtnClicked(false);
       alert("Chyba spojenia so serverom.");
     }
@@ -381,42 +418,26 @@ export default function EventCalendar({
       setSubmitBtnClicked(false);
       if (data.success) {
         if (formData.id) {
-          // Update existing
-          setEvents((prev) =>
-            prev.map((ev) =>
-              ev.id === formData.id
-                ? {
-                    ...ev,
-                    title: eventTypes.find((t) => t.id == formData.eventTypeId)
-                      ?.name,
-                    start: formData.start,
-                    end: formData.end,
-                    backgroundColor: formData.color,
-                    extendedProps: {
-                      eventTypeId: formData.eventTypeId,
-                      maxCapacity: formData.maxCapacity,
-                      admin_note: formData.admin_note,
-                    },
-                  }
-                : ev,
+          const updatedEventType = eventTypes.find(
+            (type) => type.id == formData.eventTypeId,
+          );
+          setEvents((prevEvents) =>
+            updateCalendarEvent(
+              prevEvents,
+              formData.id,
+              formData,
+              updatedEventType,
             ),
           );
         } else {
-          // Add new
-          setEvents((prev) => [
-            ...prev,
-            {
-              ...formData,
-              id: data.event_id,
-              title: eventTypes.find((t) => t.id == formData.eventTypeId)?.name,
-              backgroundColor: formData.color,
-            },
-          ]);
+          void refreshCalendarEvents().catch(console.error);
         }
-        const targetDate = formData.start.split("T")[0];
-        window.location.href = `/admin/overview?date=${targetDate}`;
 
+        const targetDate = formData.start.split("T")[0];
+        calendarRef.current?.getApi().gotoDate(targetDate);
         setModalVisible(false);
+        setSelectedEvent(null);
+        setEditType("event");
       } else {
         alert("Error: " + (data.message || "Unknown"));
       }
@@ -568,6 +589,7 @@ export default function EventCalendar({
           className="modal-overlay fixed inset-0 z-[9999] flex items-center justify-center bg-black/50"
           onClick={() => {
             setModalVisible(false);
+            setSelectedEvent(null);
             setEditType("event");
           }}
         >
@@ -578,6 +600,7 @@ export default function EventCalendar({
             <button
               onClick={() => {
                 setModalVisible(false);
+                setSelectedEvent(null);
                 setEditType("event");
               }}
               className="absolute top-3 right-3 w-10 h-10 flex items-center justify-center rounded-full border border-[var(--color-secondary)] text-[var(--color-secondary)] text-2xl hover:bg-[var(--color-secondary)] hover:text-white transition-all"
@@ -741,12 +764,10 @@ export default function EventCalendar({
                     !selectedType) && (
                     <ParticipantsList
                       reservations={
-                        selectedEvent?.extendedProps?.reservations &&
-                        (selectedEvent?.extendedProps?.reservations[0]
-                          .long_term_reservation_id ||
-                          selectedEvent?.extendedProps?.reservations[0]
-                            .event_reservation_id)
-                          ? selectedEvent?.extendedProps?.reservations
+                        selectedEventReservations?.[0]
+                          ?.long_term_reservation_id ||
+                        selectedEventReservations?.[0]?.event_reservation_id
+                          ? selectedEventReservations
                           : []
                       }
                       onDelete={handleDeleteClik}
@@ -940,52 +961,16 @@ export default function EventCalendar({
               selectedEvent && (
                 <ReservationDetail
                   onReservationUpdate={(updatedReservation) => {
-                    setEvents((prevEvents) =>
-                      prevEvents.map((event) => {
-                        if (event.id !== selectedEvent.id) return event;
-
-                        return {
-                          ...event,
-                          reservations: event.reservations?.map((res) => {
-                            const isTarget =
-                              (updatedReservation.long_term_reservation_id &&
-                                res.long_term_reservation_id ===
-                                  updatedReservation.long_term_reservation_id) ||
-                              (updatedReservation.event_reservation_id &&
-                                res.event_reservation_id ===
-                                  updatedReservation.event_reservation_id);
-
-                            return isTarget
-                              ? { ...res, ...updatedReservation }
-                              : res;
-                          }),
-                        };
-                      }),
-                    );
+                    updateSelectedReservation(updatedReservation);
                   }}
                   onPaymentChange={(attr, value, reservation_id) => {
-                    setEvents((prevEvents) =>
-                      prevEvents.map((event) => {
-                        // Only update the event that matches selectedEvent.id
-                        if (event.id !== selectedEvent.id) return event;
-                        return {
-                          ...event,
-                          reservations: event.reservations?.map((res) => {
-                            const isTarget =
-                              (res.long_term_reservation_id &&
-                                res.long_term_reservation_id ===
-                                  reservation_id) ||
-                              (res.event_reservation_id &&
-                                res.event_reservation_id === reservation_id);
-
-                            return isTarget ? { ...res, [attr]: value } : res;
-                          }),
-                        };
-                      }),
+                    updateSelectedReservation(
+                      { [attr]: value },
+                      reservation_id,
                     );
                   }}
                   reservationProps={
-                    selectedEvent?.extendedProps?.reservations?.[0] || {}
+                    selectedEventReservations?.[0] || {}
                   }
                 />
               )}
